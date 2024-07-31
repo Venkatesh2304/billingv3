@@ -1,0 +1,5 @@
+db.sqlite
+logs/
+!**/__pycache__/
+
+
