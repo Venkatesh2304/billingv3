@@ -1,4 +1,5 @@
 from collections import defaultdict
+import glob
 import json
 import re
 from django.db import connection
@@ -6,6 +7,16 @@ import pandas as pd
 from app.models import *
 import warnings
 warnings.filterwarnings("ignore")
+from custom.curl import save_request,get_curl
+
+for file in glob.glob("custom/curl/**/*.txt", recursive=True) : 
+    save_request(file)
+
+exit(0)
+
+
+
+
 
 from custom.classes import IkeaDownloader
 

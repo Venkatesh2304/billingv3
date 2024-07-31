@@ -1,5 +1,6 @@
 import argparse
 import json
+import pickle
 import re
 import sys
 from requests import Request,Session
@@ -26,20 +27,22 @@ class CurlRequest(Request) :
              self.cookies = s.cookies.get_dict()
              return s.send( self.prepare() )
 
-
-def parse_file(fname:Path) -> CurlRequest: 
-    if "win" in sys.platform : 
-        print( f"type {fname} | curlconverter -" )
-        curl_code = subprocess.run([f"type {fname} | curlconverter -"],capture_output=True,shell=True)
-    else :    
-        curl_code = subprocess.run([f"cat {fname} | curlconverter -"],capture_output=True,shell="bash")
+def save_request(fname) -> CurlRequest: 
+    print(fname)
+    fname = Path(fname)
+    curl_code = subprocess.run([f"cat {fname} | curlconverter -"],capture_output=True,shell="bash")
     curl_code = curl_code.stdout.decode('ascii') 
     for x,y in [["response = requests.post(","_request = CurlRequest('POST',"],
                 ["response = requests.get(","_request = CurlRequest('GET',"],
                 ["response = requests.head(","_request = CurlRequest('HEAD',"]] : 
         curl_code = curl_code.replace(x,y)
     exec(curl_code)
-    return locals()["_request"]    
+    curl_request = locals()["_request"]
+    with open(fname.with_suffix(".pkl"),"wb+") as f : 
+        pickle.dump(curl_request,f)
+
+def parse_file(fname:Path) -> CurlRequest :
+    return pickle.load(open(fname.with_suffix(".pkl"),"rb"))
 
 def parse(command:str) : 
     result = subprocess.run(['curlconverter', '--language', 'json', '-'], text=True, input=command, capture_output=True)

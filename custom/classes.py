@@ -112,8 +112,6 @@ class BaseIkea(Session) :
           results =  pool.starmap_async(overloaded_fn,list_of_args) if is_async else pool.starmap(overloaded_fn,list_of_args) 
           return results
 
-  
-      
 class IkeaDownloader(BaseIkea) :  
 
       def gstr(self,fromd,tod,gstr_type=1) -> BytesIO :

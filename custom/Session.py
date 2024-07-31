@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 import os
 import re
-from curlparser import parse_file
 from io import BytesIO
 import json
 from logging import Handler
