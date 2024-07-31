@@ -26,9 +26,10 @@ class CurlRequest(Request) :
              self.cookies = s.cookies.get_dict()
              return s.send( self.prepare() )
 
+
 def parse_file(fname:Path) -> CurlRequest: 
     if "win" in sys.platform : 
-        curl_code = subprocess.run([ "type " + str(fname).replace('/',"\\") + " | curlconverter -"],capture_output=True,shell="bash")
+        curl_code = subprocess.run([f"type {fname} | curlconverter -"],capture_output=True,shell=True)
     else :    
         curl_code = subprocess.run([f"cat {fname} | curlconverter -"],capture_output=True,shell="bash")
     curl_code = curl_code.stdout.decode('ascii') 
