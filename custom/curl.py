@@ -1,6 +1,7 @@
 import argparse
 import json
 import re
+import sys
 from requests import Request,Session
 from collections import namedtuple
 from urllib.parse import urlparse
@@ -26,7 +27,10 @@ class CurlRequest(Request) :
              return s.send( self.prepare() )
 
 def parse_file(fname) -> CurlRequest: 
-    curl_code = subprocess.run([f"cat {fname} | curlconverter -"],capture_output=True,shell="bash")
+    if "win" in sys.platform : 
+        curl_code = subprocess.run([ "cat " + fname.replace('/',"\\") + " | curlconverter -"],capture_output=True,shell="bash")
+    else :    
+        curl_code = subprocess.run([f"cat {fname} | curlconverter -"],capture_output=True,shell="bash")
     curl_code = curl_code.stdout.decode('ascii') 
     for x,y in [["response = requests.post(","_request = CurlRequest('POST',"],
                 ["response = requests.get(","_request = CurlRequest('GET',"],
