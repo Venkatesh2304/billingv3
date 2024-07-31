@@ -178,7 +178,6 @@ class Billing(BaseIkea) :
         return self.get(get_crlock_url).json()
     
     def release_creditlock(self, party_data):
-        return 
         party_credit = self.get_creditlock(party_data)
         set_url = f'/rsunify/app/billing/updatepartyinfo?partyCodeRef={party_data["partyCode"]}&creditBills={int(party_credit["creditBillsUtilised"])+1}&creditLimit={party_credit["creditLimit"]}&creditDays=0&panNumber=&servicingPlgValue={party_data["showPLG"]}&plgPartyCredit=true&parHllCode={party_data["parHllCode"]}'
         self.get(set_url)
