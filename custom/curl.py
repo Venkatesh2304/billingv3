@@ -29,6 +29,7 @@ class CurlRequest(Request) :
 
 def parse_file(fname:Path) -> CurlRequest: 
     if "win" in sys.platform : 
+        print( f"type {fname} | curlconverter -" )
         curl_code = subprocess.run([f"type {fname} | curlconverter -"],capture_output=True,shell=True)
     else :    
         curl_code = subprocess.run([f"cat {fname} | curlconverter -"],capture_output=True,shell="bash")
