@@ -142,7 +142,7 @@ class IkeaDownloader(BaseIkea) :
       
 class Billing(BaseIkea) :
     today = datetime.date( datetime.now() )
-    order_date = datetime.date( datetime.now() - timedelta(days=1) )
+    order_date = datetime.date( datetime.now() )
     lines = 100
     lines_count = {}
     creditrelease = {}

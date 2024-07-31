@@ -376,7 +376,6 @@ class BillingAdmin(admin.ModelAdmin) :
                 return outstanding()
             
             if action == "start" : 
-                return start(request,queryset)
                 if not start(request,queryset) : 
                     time_interval_milliseconds = 5 * 1000
             if action == "start" : 
