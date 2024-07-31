@@ -100,7 +100,7 @@ def remap_beats(beat_maps,pending_bills) :
 
 def outstanding() : 
     ikea = IkeaDownloader()
-    date = datetime.datetime.now().date()
+    date = datetime.datetime.now().date() + datetime.timedelta(days=1)
     beat_mapping = ikea.beat_mapping() 
     pending_bills = ikea.pending_bills(date)
     pending_bills = remap_beats(beat_mapping,pending_bills)
