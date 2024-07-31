@@ -10,6 +10,7 @@ import subprocess
 import json
 from pathlib import Path
 import os
+import copy 
 
 def is_url(url: str) -> bool:
     try:
@@ -42,7 +43,7 @@ def save_request(fname) -> CurlRequest:
         pickle.dump(curl_request,f)
 
 def parse_file(fname:Path) -> CurlRequest :
-    return pickle.load(open(fname.with_suffix(".pkl"),"rb"))
+    return copy.deepcopy( pickle.load(open(fname.with_suffix(".pkl"),"rb")) )
 
 def parse(command:str) : 
     result = subprocess.run(['curlconverter', '--language', 'json', '-'], text=True, input=command, capture_output=True)
