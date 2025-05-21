@@ -122,9 +122,13 @@ DATABASES = {
         'HOST':     'localhost',
         'PORT':     '5432',
     },
-    "old": {
+    "old_local": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": "/home/venkatesh/Downloads/new aws/db.sqlite3",
+    },
+    "old_server": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": "/home/ubuntu/billingv2/db.sqlite3",
     },
 }
 
