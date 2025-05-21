@@ -1,5 +1,5 @@
 """
-WSGI config for billingv2 project.
+WSGI config for billingv3 project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "billingv2.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "billing3.settings")
 
 application = get_wsgi_application()
