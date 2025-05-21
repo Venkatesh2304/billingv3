@@ -94,10 +94,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "billingv3.wsgi.application"
 
-STATICFILES_DIRS = [
-    BASE_DIR ,
-    BASE_DIR / "bills" ,
-]
+# STATICFILES_DIRS = [
+#     BASE_DIR ,
+#     BASE_DIR / "bills" ,
+# ]
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
