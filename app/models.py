@@ -26,6 +26,7 @@ class Billing(models.Model) :
     automatic = models.BooleanField(default=False,db_default=False)
 
     def __str__(self) -> str:
+        print("x",self.start_time)
         return str(self.start_time.strftime("%d/%m/%y %H:%M:%S"))
      
 class PushedCollection(models.Model) : 
