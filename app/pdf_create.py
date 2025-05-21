@@ -72,7 +72,7 @@ def loading_sheet_pdf(tables:tuple[pd.DataFrame],sheet_type:LoadingSheetType,con
     # Load and process the data
 
     df,party_sales = tables 
-    print(df)
+    print(df.iloc[0])
     df = df.dropna(subset="Sr No")
     df["MRP"] = df["MRP"].str.split(".").str[0]
     df["LC"] = df["Total LC.Units"].str.split(".").str[0]
