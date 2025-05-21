@@ -126,7 +126,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": "/home/venkatesh/Downloads/new aws/db.sqlite3",
     },
-    "olds": {
+    "old": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": "db.sqlite3",
     },
