@@ -1,6 +1,6 @@
 bind = "0.0.0.0:8080"
 workers = 1
-threads = 5
+threads = 10
 max_requests = 1000
 max_requests_jitter = 50
 
