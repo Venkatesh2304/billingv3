@@ -10,6 +10,7 @@ class BillingProcessStatusViewSet(viewsets.ModelViewSet):
     queryset = BillingProcessStatus.objects.all()
     serializer_class = BillingProcessStatusSerializer
     filterset_fields = ['billing']
+    ordering = ['id']
 
 class BillingViewSet(mixins.RetrieveModelMixin,
                   viewsets.GenericViewSet):
