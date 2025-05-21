@@ -56,6 +56,9 @@ def billing_view(request) :
     order_date = data.get("order_date") or datetime.date.today()
     last_billing = models.Billing.objects.filter(start_time__gte = datetime.datetime.now()  - datetime.timedelta(minutes=90)
                                                             ).order_by("-start_time").first()
+    print(datetime.datetime.now()  - datetime.timedelta(minutes=90))
+    print("Last Billing : ", last_billing)
+    print("Last Billing ID : ", last_billing.id if last_billing else None)
     last_billing_id = last_billing.id if last_billing else None
     if request.method == "GET" :
         return JsonResponse({"billing_id" : last_billing_id })
