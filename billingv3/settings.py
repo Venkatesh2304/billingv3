@@ -208,8 +208,6 @@ LOGGING = {
     }
 }
 
-LOGGING = {}
-
 
  
 REST_FRAMEWORK = {
