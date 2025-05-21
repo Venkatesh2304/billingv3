@@ -1,0 +1,17 @@
+*.sqlite3
+*.xlsx
+*.pdf
+logs/
+**/__pycache__/
+bill.txt
+.venv/
+custom/data/
+bill.docx
+.~*
+db1.sqlite3
+db2.sqlite3
+*.json
+*.html
+*.txt
+bills/
+voice_notes/
