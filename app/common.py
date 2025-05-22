@@ -71,13 +71,11 @@ def bulk_raw_insert(table,df,upsert=False,ignore=True,is_partial_upsert=False,in
     base_query = f"{table.lower()}({','.join(rows['columns'])}) values ({','.join( ['%s']*len(rows['columns']) )})"
     if upsert or is_partial_upsert :
         print(table)
-        conflict_index = index if type(index) == str else ",".join(index)
-        query = f"INSERT into {base_query} ON CONFLICT({conflict_index}) DO UPDATE SET {', '.join([col + '=EXCLUDED.' + col for col in rows['columns']])}" 
+        query = f"INSERT into {base_query} ON CONFLICT({index}) DO UPDATE SET {', '.join([col + '=EXCLUDED.' + col for col in rows['columns']])}" 
     elif not ignore : 
         query = f"insert into {base_query}"
     else : 
-        conflict_index = index if type(index) == str else ",".join(index)
-        query = f"insert into {base_query} on CONFLICT({conflict_index}) DO NOTHING"
+        query = f"insert into {base_query} on CONFLICT({index}) DO NOTHING"
     query_db( query , many=True , values=rows["data"] )
 
 def query_db(query,many=False,values=[],is_select=False) : 

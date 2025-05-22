@@ -21,8 +21,8 @@ def sales_insert(sales_reg,sales_gst,sales_type,permanent) :
     disc = disc.rename(columns={"inum":"bill_id"})
     both_insert("sales",sales_reg[ models.Sales.columns + ["tcs"] ],sales_gst,"bill",index = "inum")
     print_table = sales_reg[["inum"]].rename(columns={"inum":"bill_id"})
-    bulk_raw_insert("bill",print_table,ignore=True)
-    if permanent : bulk_raw_insert("discount",disc)
+    bulk_raw_insert("bill",print_table,ignore=True,index="bill_id")
+    if permanent : bulk_raw_insert("discount",disc) #warning
 
 
 # delete_sales('sales')
