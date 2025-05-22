@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 import os
 import sqlite3
 import pandas as pd
@@ -69,6 +70,7 @@ def bulk_raw_insert(table,df,upsert=False,ignore=True,is_partial_upsert=False,in
     df = df.where(pd.notnull(df), None)
     rows = df.to_dict("tight")
     base_query = f"{table.lower()}({','.join(rows['columns'])}) values ({','.join( ['%s']*len(rows['columns']) )})"
+    index = ",".join(index) if isinstance(index,Iterable) else index
     if upsert or is_partial_upsert :
         print(table)
         query = f"INSERT into {base_query} ON CONFLICT({index}) DO UPDATE SET {', '.join([col + '=EXCLUDED.' + col for col in rows['columns']])}" 
