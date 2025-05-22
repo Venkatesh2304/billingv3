@@ -22,7 +22,7 @@ from custom.classes import Billing, Einvoice
 from django.db.models import Max,F,Min,Q,F
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from django.db.models import CharField, Value
+from django.db.models import CharField, Value,Count
 from django.db.models.functions import Concat,Coalesce
 import app.pdf_create as pdf_create
 import app.aztec as aztec 
@@ -145,9 +145,14 @@ def bank_statement_upload(request) :
 def push_collection(request) :
     data = request.data
     bank_entry_ids = list(data.get("ids"))
-    cheque_entry_ids = models.BankStatement.objects.filter(id__in = bank_entry_ids).values_list("cheque_entry_id",flat=True)
-    queryset = models.BankCollection.objects.filter(Q(bank_entry_id__in = bank_entry_ids) | Q(cheque_entry_id__in = cheque_entry_ids))
-    queryset = queryset.filter(pushed = False)
+    bank_entries = models.BankStatement.objects.filter(id__in = bank_entry_ids)
+    unpushed_bank_ids = bank_entries.annotate(pushed_bills_count=Count('ikea_collection')).filter(pushed_bills_count=0).values_list("id",flat=True)
+    queryset = models.BankCollection.objects.filter(bank_entry__in = unpushed_bank_ids)
+
+    # cheque_entry_ids = models.BankStatement.objects.filter(id__in = bank_entry_ids).values_list("cheque_entry_id",flat=True)
+    # queryset = models.BankCollection.objects.filter(Q(bank_entry_id__in = bank_entry_ids) | Q(cheque_entry_id__in = cheque_entry_ids))
+    # queryset = queryset.filter(pushed = False)
+
     billing = Billing()
     coll:pd.DataFrame = billing.download_manual_collection() # type: ignore
     manual_coll = []

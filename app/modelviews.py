@@ -73,6 +73,7 @@ class BankViewSet(viewsets.ModelViewSet):
 
         def filter_pushed(self, queryset, name, pushed):
             if pushed == False : 
+                return queryset.annotate(pushed_bills_count=Count('ikea_collection')).filter(pushed_bills_count=0)
                 return queryset.filter(Q(collection__pushed = False) | Q(cheque_entry__collection__pushed = False)).distinct()
             return queryset 
 
