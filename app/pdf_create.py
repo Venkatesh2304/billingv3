@@ -72,7 +72,6 @@ def loading_sheet_pdf(tables:tuple[pd.DataFrame],sheet_type:LoadingSheetType,con
     # Load and process the data
 
     df,party_sales = tables 
-    print(df.iloc[0])
     df = df.dropna(subset="Sr No")
     df["MRP"] = df["MRP"].str.split(".").str[0]
     df["LC"] = df["Total LC.Units"].str.split(".").str[0]
@@ -99,7 +98,7 @@ def loading_sheet_pdf(tables:tuple[pd.DataFrame],sheet_type:LoadingSheetType,con
     lines_count = len(df.index)
     # bills =  f'{party_sales["Party"].min()} - {party_sales["Party"].max()}'
     time = datetime.datetime.now().strftime("%d-%b-%Y %I:%M %p") 
-    total_value = round(float(party_sales.iloc[-1]["Net Amt"]))
+    total_value = round(float(party_sales.iloc[-1]["Gross Amount"]))
     
 
     # Create PDF

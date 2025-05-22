@@ -76,8 +76,8 @@ def bulk_raw_insert(table,df,upsert=False,ignore=True,is_partial_upsert=False,in
     elif not ignore : 
         query = f"insert into {base_query}"
     else : 
-        query = f"insert or ignore into {base_query}"
-        query = f"insert into {base_query} on CONFLICT DO NOTHING"
+        conflict_index = index if type(index) == str else ",".join(index)
+        query = f"insert into {base_query} on CONFLICT({conflict_index}) DO NOTHING"
     query_db( query , many=True , values=rows["data"] )
 
 def query_db(query,many=False,values=[],is_select=False) : 

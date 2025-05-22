@@ -127,7 +127,8 @@ def bank_statement_upload(request) :
     else : 
         raise Exception(f"Bank acc no : {acc} doesn't have a bank")
     df["idx"] = df.groupby(df["date"].dt.date).cumcount() + 1 
-    df = df[["date","ref","desc","amt","idx"]]
+    df['"desc"'] = df["desc"].copy()
+    df = df[["date","ref",'"desc"',"amt","idx"]]
     df["bank"] = bank_name 
     already_assigned_ids = models.BankStatement.objects.values_list("id",flat=True).distinct()
     free_ids = list(set(range(100000,999999)) - set(already_assigned_ids))
@@ -136,7 +137,7 @@ def bank_statement_upload(request) :
     df = df[df.amt != ""][df.amt.notna()]
     df.amt = df.amt.astype(str).str.replace(",","").apply(lambda x  : float(x.strip()) if x.strip() else 0)
     df = df[df.amt != 0]    
-    bulk_raw_insert("bankstatement",df,ignore=True)
+    bulk_raw_insert("bankstatement",df,ignore=True,index="id")
     return JsonResponse({"status" : "success"})
 
 @api_view(["POST"])

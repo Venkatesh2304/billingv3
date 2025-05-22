@@ -101,11 +101,12 @@ def print_bills(request) :
     if len(bills) == 0 :
         return JsonResponse({"status" : "error" , "error" : "Zero Bills Selected to print"})
     qs = models.Bill.objects.filter(bill_id__in = bills)
-    #Remove already printed
-    loading_sheets = list(qs.values_list("loading_sheet",flat=True).distinct())
-    qs.update(print_time=None,loading_sheet=None,is_reloaded = True)
-    models.SalesmanLoadingSheet.objects.filter(inum__in = loading_sheets).delete()
-    qs = qs.all() #Refetch queryset
+    #Remove already printed , if not loading sheet
+    if full_print_type != "loading_sheet" : 
+        loading_sheets = list(qs.values_list("loading_sheet",flat=True).distinct())
+        qs.update(print_time=None,loading_sheet=None,is_reloaded = True)
+        models.SalesmanLoadingSheet.objects.filter(inum__in = loading_sheets).delete()
+        qs = qs.all() #Refetch queryset
 
     if full_print_type == "reload_bill" : 
         return JsonResponse({"status" : "success"})
