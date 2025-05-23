@@ -223,4 +223,32 @@ def unpush_collection(request,bank_id) :
         sync_reports(limits = {"collection" : None})
     return JsonResponse({"status" : "success"})
 
+
+@api_view(["GET"])
+def auto_match_statement(self,request,qs) :
+    qs = models.BankStatement.objects.filter(date__gte = datetime.date.today() - datetime.timedelta(days=7)) 
+    qs.filter(Q(desc__icontains="cash") & Q(desc__icontains="deposit")).update(type="cash_deposit")
+    qs = qs.filter(Q(type__isnull=True)|Q(type="upi"))
+    fromd = qs.aggregate(Min("date"))["date__min"]
+    tod = qs.aggregate(Max("date"))["date__max"]
+    upi_statement:pd.DataFrame = IkeaDownloader().upi_statement(fromd - datetime.timedelta(days = 3),tod)
+    upi_statement["FOUND"] = "No"
+    upi_statement["PAYMENT ID"] = upi_statement["PAYMENT ID"].astype(str).str.split(".").str[0]
+    for bank_obj in qs.all() : 
+        for _,row in upi_statement.iterrows() : 
+            if (row["FOUND"] == "No") and (row["PAYMENT ID"] in bank_obj.desc) : 
+                bank_obj.type = "upi"
+                bank_obj.save()
+                upi_statement.loc[_,"FOUND"] = "Yes"
+                
+    upi_during_period = upi_statement[(upi_statement["COLLECTED DATE"].dt.date >= fromd)] 
+    upi_before_period = upi_statement[(upi_statement["COLLECTED DATE"].dt.date < fromd)] 
+    with pd.ExcelWriter("UPI Matching.xlsx") as writer :
+        upi_during_period[upi_during_period["FOUND"] == "No"].to_excel(writer,sheet_name="Un-Matched UPI (Current)",index=False)
+        upi_during_period[upi_during_period["FOUND"] == "Yes"].to_excel(writer,sheet_name="Matched UPI (Current)",index=False)
+        upi_before_period[upi_before_period["FOUND"] == "Yes"].to_excel(writer,sheet_name=f"Matched UPI (Before)",index=False)
+    
+    link = hyperlink(f"/static/UPI Matching.xlsx",f"Download UPI Matching",style="text-decoration:underline;color:blue;") 
+    messages.success(request,mark_safe(link))
+
 #TODO: Referesh collection 
