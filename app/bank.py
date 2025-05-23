@@ -152,7 +152,7 @@ def push_collection(request) :
 
     cheque_entry_ids = models.BankStatement.objects.filter(id__in = bank_entry_ids).values_list("cheque_entry_id",flat=True)
     queryset = models.BankCollection.objects.filter(Q(bank_entry_id__in = bank_entry_ids) | Q(cheque_entry_id__in = cheque_entry_ids))
-    queryset = queryset.filter(pushed = False)
+    # queryset = queryset.filter(pushed = False)
 
     billing = Billing()
     coll:pd.DataFrame = billing.download_manual_collection() # type: ignore
@@ -207,7 +207,6 @@ def push_collection(request) :
 def unpush_collection(request,bank_id) : 
     billing = Billing()
     qs = models.BankStatement.objects.get(id = bank_id).all_collection
-    qs = qs.filter(pushed = True)
     if qs.count() : 
         bill_chq_pairs = [ (bank_id,bank_coll.bill_id) for bank_coll in qs.all() ]
         dates = models.BankStatement.objects.filter(id = bank_id).aggregate(
