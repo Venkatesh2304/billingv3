@@ -145,7 +145,7 @@ def bank_statement_upload(request) :
 def push_collection(request) :
     data = request.data
     bank_entry_ids = list(data.get("ids"))
-    bank_entry_ids = [ obj.id for obj in models.BankStatement.objects.filter(id__in = bank_entry_ids) if not obj.pushed ]
+    bank_entry_ids = [ obj.id for obj in models.BankStatement.objects.filter(id__in = bank_entry_ids).exclude(cheque_status = "bounced") if not obj.pushed ]
 
     # unpushed_bank_ids = bank_entries.annotate(pushed_bills_count=Count('ikea_collection')).filter(pushed_bills_count=0).values_list("id",flat=True)
     # queryset = models.BankCollection.objects.filter(bank_entry__in = unpushed_bank_ids)

@@ -428,6 +428,8 @@ class BankStatement(models.Model) :
     def status(self) : 
         if self.type is None : return 0 
         if self.type in ["cheque","neft"] :
+            if self.cheque_status and (self.cheque_status == "bounced") : 
+                return 3 
             all_collection_count = self.all_collection.count()
             ikea_collection_count = self.ikea_collection.count()
             is_some_not_pushed = (all_collection_count > ikea_collection_count) #self.all_collection.filter(pushed = False).exists()

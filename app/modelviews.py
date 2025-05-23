@@ -78,7 +78,10 @@ class BankViewSet(viewsets.ModelViewSet):
                 # return queryset.filter(Q(collection__pushed = False) | Q(cheque_entry__collection__pushed = False)).distinct()
             return queryset 
 
-
+    def get_queryset(self):
+        today = datetime.date.today()
+        return BankStatement.objects.filter(date__gte = today - datetime.timedelta(days=30))
+    
     queryset = BankStatement.objects.all()
     serializer_class = BankSerializer
     filterset_class = BankFilter
