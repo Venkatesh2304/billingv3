@@ -145,13 +145,14 @@ def bank_statement_upload(request) :
 def push_collection(request) :
     data = request.data
     bank_entry_ids = list(data.get("ids"))
-    bank_entries = models.BankStatement.objects.filter(id__in = bank_entry_ids)
-    unpushed_bank_ids = bank_entries.annotate(pushed_bills_count=Count('ikea_collection')).filter(pushed_bills_count=0).values_list("id",flat=True)
-    queryset = models.BankCollection.objects.filter(bank_entry__in = unpushed_bank_ids)
+    bank_entry_ids = [ obj.id for obj in models.BankStatement.objects.filter(id__in = bank_entry_ids) if not obj.pushed ]
 
-    # cheque_entry_ids = models.BankStatement.objects.filter(id__in = bank_entry_ids).values_list("cheque_entry_id",flat=True)
-    # queryset = models.BankCollection.objects.filter(Q(bank_entry_id__in = bank_entry_ids) | Q(cheque_entry_id__in = cheque_entry_ids))
-    # queryset = queryset.filter(pushed = False)
+    # unpushed_bank_ids = bank_entries.annotate(pushed_bills_count=Count('ikea_collection')).filter(pushed_bills_count=0).values_list("id",flat=True)
+    # queryset = models.BankCollection.objects.filter(bank_entry__in = unpushed_bank_ids)
+
+    cheque_entry_ids = models.BankStatement.objects.filter(id__in = bank_entry_ids).values_list("cheque_entry_id",flat=True)
+    queryset = models.BankCollection.objects.filter(Q(bank_entry_id__in = bank_entry_ids) | Q(cheque_entry_id__in = cheque_entry_ids))
+    queryset = queryset.filter(pushed = False)
 
     billing = Billing()
     coll:pd.DataFrame = billing.download_manual_collection() # type: ignore

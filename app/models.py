@@ -439,7 +439,7 @@ class BankStatement(models.Model) :
 
     @property
     def pushed(self) :
-         return self.ikea_collection.exists()  #.all_collection.filter(pushed = True).exists() 
+         return self.ikea_collection.exists() #.all_collection.filter(pushed = True).exists()  
 
     @property
     def all_collection(self) :
