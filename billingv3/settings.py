@@ -124,7 +124,7 @@ DATABASES_CONFIG = {
 DATABASES = {
     'default': {
         'ENGINE':   'django.db.backends.postgresql',
-        'NAME':     DATABASES_CONFIG[os.environ.get('user')],
+        'NAME':     DATABASES_CONFIG[os.environ.get('app_user')],
         'USER':     'postgres',
         'PASSWORD': 'Ven2004',
         'HOST':     'localhost',

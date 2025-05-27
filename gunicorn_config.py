@@ -10,7 +10,7 @@ CONFIG = {
         "port" : 8082 
     }
 }
-user = os.environ.get('user')
+user = os.environ.get('app_user')
 config = CONFIG[user]
 port = config['port']
 bind = f"0.0.0.0:{port}"
