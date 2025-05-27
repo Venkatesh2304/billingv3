@@ -113,10 +113,18 @@ WSGI_APPLICATION = "billingv3.wsgi.application"
 #     }
 # }
 
+
+DATABASES_CONFIG = {
+    "a1" : "hul_devaki" , 
+    "lakme_urban" : "lakme_urban" ,
+    "lakme_rural" : "lakme_rural" ,
+}
+
+
 DATABASES = {
     'default': {
         'ENGINE':   'django.db.backends.postgresql',
-        'NAME':     'hul_devaki',
+        'NAME':     DATABASES_CONFIG[os.environ.get('user')],
         'USER':     'postgres',
         'PASSWORD': 'Ven2004',
         'HOST':     'localhost',

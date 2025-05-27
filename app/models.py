@@ -331,7 +331,7 @@ class Outstanding(models.Model) :
           print("Uploaded today outstanding to mongo DB")
   
       class Meta : 
-            managed =  False
+            # managed =  False
             verbose_name_plural = 'Outstanding'
 
 
