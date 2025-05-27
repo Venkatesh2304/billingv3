@@ -225,7 +225,7 @@ def unpush_collection(request,bank_id) :
 
 @api_view(["POST"])
 def auto_match_upi(request) :
-    qs = models.BankStatement.objects.filter(date__gte = datetime.date.today() - datetime.timedelta(days=7)) 
+    qs = models.BankStatement.objects.filter(date__gte = datetime.date.today() - datetime.timedelta(days=15)) 
     qs.filter(Q(desc__icontains="cash") & Q(desc__icontains="deposit")).update(type="cash_deposit")
     qs = qs.filter(Q(type__isnull=True)|Q(type="upi"))
     fromd = qs.aggregate(Min("date"))["date__min"]
