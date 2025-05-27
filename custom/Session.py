@@ -203,8 +203,8 @@ class Session(requests.Session, ABC):
             self.logger.addHandler(file_handler)
 
         # Fetch username (mutliple methods)
-        if "user" in os.environ:
-            self.user = os.environ["user"]
+        if "app_user" in os.environ:
+            self.user = os.environ["app_user"]
             self.logger.debug(
                 f"User {self.user} has fetched using enviroment variables"
             )
