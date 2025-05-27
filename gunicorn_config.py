@@ -11,9 +11,7 @@ CONFIG = {
     }
 }
 app_user = os.environ.get('app_user')
-config = CONFIG[app_user]
-port = config['port']
-bind = f"0.0.0.0:{port}"
+bind = f"0.0.0.0:{CONFIG[app_user]['port']}"
 workers = 1
 threads = 10
 max_requests = 1000
