@@ -69,10 +69,9 @@ from urllib.parse import quote, unquote
 # from django_admin_multi_selecfrom django.db.models.functions import Concat
 from django.db.models import CharField, Value
 from django.db.models.functions import Concat
-
-
-
-START_DATE = datetime.date(2024,4,1)
+import os 
+user = os.environ.get("app_user")
+START_DATE = datetime.date(2025 if "lakme" in user else 2024,4,1)
 
 def check_last_sync(type,limit) :
     if limit is None : return False 
