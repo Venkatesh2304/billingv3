@@ -82,7 +82,6 @@ def einvoice_upload(einvoice_service,einv_qs) :
 
 @api_view(["POST"])
 def print_bills(request) : 
-    sync_reports(limits={"sales":5*60})
     data = request.data
     full_print_type = data.get("print_type")
      

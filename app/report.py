@@ -6,10 +6,12 @@ from io import BytesIO
 import json
 import threading
 import time
-from django.http import HttpResponse, JsonResponse
+from PyPDF2 import PdfReader, PdfWriter
+from django.http import FileResponse, HttpResponse, JsonResponse
 from openpyxl import load_workbook
 import pandas as pd
-from app.common import query_db
+from app import models, pdf_create
+from app.common import bulk_raw_insert, query_db
 from app.sync import sync_reports
 from custom.classes import Billing
 from rest_framework.decorators import api_view
@@ -187,4 +189,47 @@ def outstanding(request) :
     writer.close()
     output.seek(0)
     with open("outstanding.xlsx","wb+") as f : f.write(output.getvalue())
+    return JsonResponse({"status":"success"})
+
+
+@api_view(["POST"])
+def pending_sheet(request) :
+    date = request.data.get("date")
+    beat_type = request.data.get("type")
+    date = datetime.datetime.strptime(date,"%Y-%m-%d").date()
+    queryset = models.Beat.objects.filter(days__contains = date.strftime("%A").lower())
+    if beat_type == "retail" : 
+        queryset = queryset.exclude(name__contains = "WHOLESALE")
+    else :
+        queryset = queryset.filter(name__contains = "WHOLESALE")
+    
+    beat_ids = { str(id) for id in queryset.values_list("id",flat=True) }
+    beat_maps = { beat.name : (beat.salesman_name,beat.id) for beat in queryset.all() }
+    billing = Billing()
+    bytesio = billing.pending_statement_excel(beat_ids,date - datetime.timedelta(days=1)) #Dont consider bills on the same date
+    df = pd.read_excel(bytesio,skiprows = 13,skipfooter=1)
+    df = df.dropna(subset = "Beat Name")
+    df["Salesperson Name"] = df["Salesperson Name"].str.split("-").str[1]
+    pdfs = [] 
+    for beat , rows in df.groupby("Beat Name") : 
+        max_days_per_party = rows.groupby("Party Name")["Bill Ageing (In Days)"].max().to_dict()
+        rows["max_days_per_party"] = rows["Party Name"].map(max_days_per_party)
+        rows = rows.sort_values(by = ["max_days_per_party","Party Name"] , ascending=False)
+        salesman,beat_id = beat_maps[beat]
+        sheet_no = "PS" + date.strftime("%d%m%y") + str(beat_id)
+        models.PendingSheet(sheet_no=sheet_no,beat=beat,salesman=salesman,date=date).save()
+        rows["sheet_id"] = sheet_no 
+        renamed_rows = rows.rename(columns={"Bill No":"bill_id","OutstANDing Amount":"outstanding_amt","Bill Ageing (In Days)" : "days"})
+        bulk_raw_insert("pendingsheetbill",renamed_rows[["sheet_id","bill_id","days","outstanding_amt"]],ignore=True,index=["sheet_id","bill_id"])
+        bytesio = pdf_create.pending_sheet_pdf(rows , sheet_no ,  salesman , beat , date)
+        pdfs.append(bytesio)
+    
+    writer = PdfWriter()
+    for pdf in pdfs :
+        reader = PdfReader(pdf)
+        for page in reader.pages:
+            writer.add_page(page)
+        if len(reader.pages) % 2 != 0:
+            writer.add_blank_page()
+    writer.write("pending_sheet.pdf")
     return JsonResponse({"status":"success"})

@@ -38,10 +38,12 @@ urlpatterns = [
     path('bank_statement_upload/', bank.bank_statement_upload, name='bank_statement_upload'),
     path('push_collection/', bank.push_collection, name='push_collection'),
     path('unpush_collection/<str:bank_id>/', bank.unpush_collection, name='unpush_collection'),
+    path('match_upi/', bank.auto_match_upi, name='match_upi'),
 
 
     path('basepack/', report.basepack , name='basepack'),
     path('outstanding_report/', report.outstanding , name='outstanding_report'),
+    path('pending_sheet/', report.pending_sheet , name='pending_sheet'),
 
     # path('party_outstanding/', views.get_party_outstanding, name='party_outstanding'),
     # path('billautocomplete/', BillAutocomplete.as_view(), name='billautocomplete'),

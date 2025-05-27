@@ -395,9 +395,10 @@ class ChequeDeposit(models.Model) :
     def __str__(self) -> str:
          return f"CHQ: {self.cheque_no} - AMT: {self.amt} - {self.party.name}"
     
-    @property
-    def pushed(self) :
-         return (not self.collection.filter(pushed = False).exists())
+    # @property
+    # def pushed(self) :
+    #      return (self.bank_entry  and self.bank_entry.pushed)
+    #     #  return (not self.collection.filter(pushed = False).exists())
     
 class BankCollection(models.Model) : 
       bill = ForeignKey("app.Outstanding",db_index=False,db_constraint=False,on_delete=models.DO_NOTHING)
@@ -450,35 +451,35 @@ class BankStatement(models.Model) :
         return BankCollection.objects.filter(Q(bank_entry_id = self.id) | Q(cheque_entry__bank_entry = self.id))
 
      
-# class PendingSheet(models.Model) : 
-#     sheet_no = models.CharField(max_length=20,primary_key=True)
-#     date = models.DateField()
-#     salesman = models.TextField(max_length=30)
-#     beat = models.TextField(max_length=30)
+class PendingSheet(models.Model) : 
+    sheet_no = models.CharField(max_length=20,primary_key=True)
+    date = models.DateField()
+    salesman = models.TextField(max_length=30)
+    beat = models.TextField(max_length=30)
 
-# class PendingSheetBill(models.Model) : 
-    # sheet = ForeignKey("app.PendingSheet",on_delete=models.CASCADE,related_name="bills")
-    # bill = ForeignKey("app.Sales",db_index=False,db_constraint=False,on_delete=models.DO_NOTHING)
-    # days = models.IntegerField()
-    # # salesman = models.TextField(max_length=30)
-    # # bill_amt = models.IntegerField()
-    # outstanding_amt = models.IntegerField()
-    # outstanding_on_ikea = models.IntegerField(null=True)
-    # outstanding_on_bill = models.IntegerField(null=True)
-    # outstanding_on_sheet = models.IntegerField(null=True)
-    # payment_mode = models.TextField(max_length=15,choices=(("cash","Cash"),("cheque","Cheque"),("neft","NEFT")),null=True)
-    # bill_status = models.TextField(max_length=25,choices=(("scanned","Scanned"),
-    #                                                       ("qrcode_not_found","qrcode_not_found"),
-    #                                                       ("loading_sheet","loading_sheet"),
-    #                                                       ("sales_return","sales_return"),
-    #                                                       ("bill_with_shop","Bill With Shop"),
-    #                                                       ("others","Other Reason"),
-    #                                                       ),null=True,default="scanned")
-    # class Meta : 
-    #       unique_together = ('sheet', 'bill')
+class PendingSheetBill(models.Model) : 
+    sheet = ForeignKey("app.PendingSheet",on_delete=models.CASCADE,related_name="bills")
+    bill = ForeignKey("app.Sales",db_index=False,db_constraint=False,on_delete=models.DO_NOTHING)
+    days = models.IntegerField()
+    # salesman = models.TextField(max_length=30)
+    # bill_amt = models.IntegerField()
+    outstanding_amt = models.IntegerField()
+    outstanding_on_ikea = models.IntegerField(null=True)
+    outstanding_on_bill = models.IntegerField(null=True)
+    outstanding_on_sheet = models.IntegerField(null=True)
+    payment_mode = models.TextField(max_length=15,choices=(("cash","Cash"),("cheque","Cheque"),("neft","NEFT")),null=True)
+    bill_status = models.TextField(max_length=25,choices=(("scanned","Scanned"),
+                                                          ("qrcode_not_found","qrcode_not_found"),
+                                                          ("loading_sheet","loading_sheet"),
+                                                          ("sales_return","sales_return"),
+                                                          ("bill_with_shop","Bill With Shop"),
+                                                          ("others","Other Reason"),
+                                                          ),null=True,default="scanned")
+    class Meta : 
+          unique_together = ('sheet', 'bill')
 
-    # def status(self) : 
-    #     return bool(self.outstanding_on_bill is not None)
+    def status(self) : 
+        return bool(self.outstanding_on_bill is not None)
 
 # class SalesmanCollectionBill(models.Model) : 
 #     chq = ForeignKey("app.SalesmanCollection",on_delete=models.CASCADE,related_name="bills")

@@ -18,7 +18,7 @@ from app.common import bulk_raw_insert, query_db
 import app.models as models 
 from app.sync import sync_reports
 from custom import secondarybills
-from custom.classes import Billing, Einvoice
+from custom.classes import Billing, Einvoice, IkeaDownloader
 from django.db.models import Max,F,Min,Q,F
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -223,9 +223,8 @@ def unpush_collection(request,bank_id) :
         sync_reports(limits = {"collection" : None})
     return JsonResponse({"status" : "success"})
 
-
-@api_view(["GET"])
-def auto_match_statement(self,request,qs) :
+@api_view(["POST"])
+def auto_match_upi(request) :
     qs = models.BankStatement.objects.filter(date__gte = datetime.date.today() - datetime.timedelta(days=7)) 
     qs.filter(Q(desc__icontains="cash") & Q(desc__icontains="deposit")).update(type="cash_deposit")
     qs = qs.filter(Q(type__isnull=True)|Q(type="upi"))
@@ -242,13 +241,20 @@ def auto_match_statement(self,request,qs) :
                 upi_statement.loc[_,"FOUND"] = "Yes"
                 
     upi_during_period = upi_statement[(upi_statement["COLLECTED DATE"].dt.date >= fromd)] 
-    upi_before_period = upi_statement[(upi_statement["COLLECTED DATE"].dt.date < fromd)] 
-    with pd.ExcelWriter("UPI Matching.xlsx") as writer :
+    upi_before_period = upi_statement[(upi_statement["COLLECTED DATE"].dt.date < fromd)]         
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=UPI Matching.xlsx'
+    with pd.ExcelWriter(response, engine='xlsxwriter') as writer:
         upi_during_period[upi_during_period["FOUND"] == "No"].to_excel(writer,sheet_name="Un-Matched UPI (Current)",index=False)
         upi_during_period[upi_during_period["FOUND"] == "Yes"].to_excel(writer,sheet_name="Matched UPI (Current)",index=False)
         upi_before_period[upi_before_period["FOUND"] == "Yes"].to_excel(writer,sheet_name=f"Matched UPI (Before)",index=False)
     
-    link = hyperlink(f"/static/UPI Matching.xlsx",f"Download UPI Matching",style="text-decoration:underline;color:blue;") 
-    messages.success(request,mark_safe(link))
+    return response
 
-#TODO: Referesh collection 
+#TODO: Referesh collection (warning : not complete yet)
+@api_view(["GET"])
+def refresh_bank(request) : 
+    sync_reports(limits={"collection": None},min_days_to_sync={"collection" : 15})
+    return JsonResponse({"status" : "success"})
+
+

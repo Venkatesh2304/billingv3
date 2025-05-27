@@ -6,6 +6,8 @@ from rest_framework.response import Response
 from django_filters import rest_framework as filters
 from rest_framework.pagination import LimitOffsetPagination
 
+from app.sync import sync_reports
+
 class BillingProcessStatusViewSet(viewsets.ModelViewSet):
     queryset = BillingProcessStatus.objects.all()
     serializer_class = BillingProcessStatusSerializer
@@ -46,7 +48,11 @@ class BillViewSet(viewsets.ModelViewSet):
             elif beat_type == "wholesale" :
                 queryset = queryset.filter(bill__beat__contains = "WHOLESALE")
             return queryset
-            
+    
+    def list(self, request, *args, **kwargs):
+        sync_reports(limits={"sales":5*60})
+        return super().list(request, *args, **kwargs)
+    
     queryset = Bill.objects.all() #[:1000]
     serializer_class = BillSerializer
     filterset_class = BillFilter
@@ -60,6 +66,13 @@ class ChequeViewSet(viewsets.ModelViewSet):
     pagination_class = Pagination
     ordering = ["-id"]
     ordering_fields = ["id"]
+    class ChequeFilter(filters.FilterSet):
+        is_depositable = filters.BooleanFilter(method ='filter_is_depositable')
+        def filter_is_depositable(self, queryset, name, value):
+            if value : 
+                return queryset.filter(deposit_date__isnull = True,cheque_date__lte = datetime.date.today())
+            return queryset
+    filterset_class = ChequeFilter
 
 class BankViewSet(viewsets.ModelViewSet):
     class BankFilter(filters.FilterSet):
