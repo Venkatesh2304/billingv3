@@ -10,8 +10,8 @@ CONFIG = {
         "port" : 8082 
     }
 }
-user = os.environ.get('app_user')
-config = CONFIG[user]
+app_user = os.environ.get('app_user')
+config = CONFIG[app_user]
 port = config['port']
 bind = f"0.0.0.0:{port}"
 workers = 1
@@ -19,6 +19,6 @@ threads = 10
 max_requests = 1000
 max_requests_jitter = 50
 
-accesslog = f"/home/ubuntu/logs/access_{user}.log"
-errorlog = f"/home/ubuntu/logs/error_{user}.log"
+accesslog = f"/home/ubuntu/logs/access_{app_user}.log"
+errorlog = f"/home/ubuntu/logs/error_{app_user}.log"
 loglevel = "info"
