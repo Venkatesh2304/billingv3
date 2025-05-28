@@ -48,7 +48,7 @@ class Basepack :
         basepack = basepack[ basepack["color"] != 52 ][basepack["BasePack Code"].notna()]
         basepack["new_status"] = basepack["BasePack Code"].isin([ str(code) for code in self.active_basepack_codes ])
         basepack = basepack[ basepack["new_status"] != (basepack["Status"] == "ACTIVE") ]
-        basepack.to_excel("basepack.xlsx",index=False,sheet_name="Basepack Information")      
+        basepack.to_excel(f"{FILES_DIR}/basepack.xlsx",index=False,sheet_name="Basepack Information")      
         basepack["Status"] = basepack["Status"].replace({ "ACTIVE" : "INACTIVE_x" , "INACTIVE" : "ACTIVE_x" })
         basepack["Status"] = basepack["Status"].str.split("_").str[0] 
         basepack = basepack[ list(basepack.columns)[5:11] ]
@@ -63,7 +63,7 @@ class Basepack :
         output.seek(0)
 
         print( "Basepack Changed (NEW STATUS COUNTS) : " ,  basepack["Status"].value_counts().to_dict() )
-        with open('basepack.xlsx', 'wb+') as f:  
+        with open(f'{FILES_DIR}/basepack.xlsx', 'wb+') as f:  
             f.write(output.read())
         
         if len(basepack.index) : 
