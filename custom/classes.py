@@ -19,7 +19,7 @@ import re
 from pathlib import Path    
 from multiprocessing.pool import ThreadPool
 from tqdm import tqdm
-from urllib.parse import parse_qsl
+from urllib.parse import parse_qsl, urljoin
 import hashlib
 import json
 import os
@@ -47,6 +47,7 @@ class BaseIkea(Session) :
       IKEA_GENERATE_REPORT_URL = "/rsunify/app/reportsController/generatereport"
       IKEA_DOWNLOAD_REPORT_URL = "/rsunify/app/reportsController/downloadReport?filePath="
       load_cookies = True 
+      force_base_url = True 
       
       def date_epochs(self) :
         return int((datetime.datetime.now() - datetime.datetime(1970, 1, 1)
@@ -60,9 +61,7 @@ class BaseIkea(Session) :
           if "jsonObjWhereClause" in r.data :
                 r.data['jsonObjWhereClause'] =  curl_replace(  pat , replaces ,  r.data['jsonObjWhereClause'] )
                 if "jsonObjforheaders" in r.data  : del r.data['jsonObjforheaders']
-          print(r.data)
           durl = r.send(self).text
-          print(durl)
           if durl == "" : return None 
           res = self.download_file( durl , fname )
           return pd.read_excel(res) if is_dataframe else res 
@@ -119,8 +118,8 @@ class BaseIkea(Session) :
              self.login()
              retry_count += 1
 
-      def get_buffer(self,relative_url) : 
-          return super().get_buffer(self.IKEA_DOWNLOAD_REPORT_URL + relative_url)
+      def get_buffer(self,relative_url) :
+          return super().get_buffer( self.IKEA_DOWNLOAD_REPORT_URL + relative_url )
       
       def parllel(self,fn,list_of_args,max_workers=10,show_progress=False,is_async=False) : 
           pool = ThreadPool(max_workers) 

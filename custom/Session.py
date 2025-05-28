@@ -4,7 +4,7 @@ import re
 from io import BytesIO
 import json
 from logging import Handler
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 import requests
 import curlify
 import logging
@@ -190,6 +190,7 @@ class Session(requests.Session, ABC):
     logging_enabled = True
     base_url = None
     load_cookies = False
+    force_base_url = False
 
     @property
     @abstractmethod
@@ -274,6 +275,9 @@ class Session(requests.Session, ABC):
 
     def send(self, request, *args, **kwargs) -> Response:
         ## Middleware overriding the default send function to capture it in logs
+        if self.force_base_url : 
+            if self.base_url not in request.url : 
+                request.url = self.base_url + request.url.split(".com")[1]
         response = super().send(request, *args, **(kwargs | {"verify":False,"timeout":120}))
         try : 
             self.logger.log_response(response)
