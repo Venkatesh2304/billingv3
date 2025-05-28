@@ -16,6 +16,7 @@ import pandas as pd
 from enum import Enum, IntEnum
 from app.common import bulk_raw_insert, query_db
 import app.models as models 
+from billingv3.settings import FILES_DIR
 from custom import secondarybills
 from custom.classes import Billing, Einvoice
 from django.db.models import Max,F,Min,Q,F
@@ -74,7 +75,7 @@ def party_names(request) :
 
 @api_view(["GET"])
 def download_file(request,fname) :
-    response = FileResponse(open(fname, 'rb')) #, content_type='application/pdf')    
+    response = FileResponse(open(os.path.join(FILES_DIR,fname), 'rb')) #, content_type='application/pdf')    
     response['Content-Disposition'] = f'inline; filename="{fname}"' 
     return response
 
