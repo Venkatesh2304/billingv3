@@ -44,19 +44,33 @@ class UserDB:
         return self.user_data
 
     def update_user(self, field_key, field_value):
-        self.db.update_one(
-            {DB_USER_FIELD: self.user},
-            [{"$set": {self.class_key: {field_key: field_value}}}],
-            upsert=True,
-        )
+        if self.class_key == "einvoice" : 
+            self.db.update_one(
+                {DB_USER_FIELD: self.user_data["einvoice"]},
+                [{"$set": {field_key: field_value}}],
+                upsert=True,
+            )
+        else : 
+            self.db.update_one(
+                {DB_USER_FIELD: self.user},
+                [{"$set": {self.class_key: {field_key: field_value}}}],
+                upsert=True,
+            )
+
+    def get_einvoice_config(self) : 
+        return self.db.find_one({DB_USER_FIELD: self.user_data["einvoice"]})
 
     def get_cookies(self):
         if self.user_data is None:
             self.get_user()
         cookies = {}
-        if DB_COOKIE_FIELD in self.user_data[self.class_key]:
+        if self.class_key == "einvoice" : 
+            cookie = self.get_einvoice_config()
+        else : 
+            cookie = self.user_data[self.class_key]
+        if DB_COOKIE_FIELD in cookie :
             cookies = json.loads(
-                self.user_data[self.class_key][DB_COOKIE_FIELD].replace("'", '"')
+                cookie[DB_COOKIE_FIELD].replace("'", '"')
             )
         return cookies
 
@@ -233,7 +247,7 @@ class Session(requests.Session, ABC):
 
         self.db = UserDB(user_db, self.user, self.key)
         self.user_config = self.db.get_user()
-        self.config = self.user_config[self.key]
+        self.config = self.user_config[self.key] if self.key != "einvoice" else self.db.get_einvoice_config()
         self.previous_cookies = self.db.get_cookies()
         if self.load_cookies and self.previous_cookies : 
             for name,value,domain,path in self.previous_cookies : 

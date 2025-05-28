@@ -898,7 +898,7 @@ class Einvoice(Session) :
       def __init__(self):
            super().__init__()
            self.form = self.config.get("form",{})
-           print(self.form)
+           
    
       def captcha(self) : 
           self.cookies.clear()
@@ -910,6 +910,8 @@ class Einvoice(Session) :
           return img 
           
       def login(self,captcha) : 
+          print(self.form)
+          print(self.config)
           r = get_curl("einvoice/login")
           if type(self.form) == str : self.form = json.loads(self.form)
           salt = self.get("/Home/GetKey").json()["key"]
@@ -922,17 +924,19 @@ class Einvoice(Session) :
                                  "UserLogin.HiddenPasswordSha":sha_pwd,
                                  "UserLogin.PasswordMD5":md5pwd}
           response  = r.send(self)
+          print(response.status_code)
           is_success = (response.url == f"{self.base_url}/Home/MainMenu")
           error_div  = BeautifulSoup(response.text, 'html.parser').find("div",{"class":"divError"})
           error = error_div.text.strip() if (not is_success) and (error_div is not None) else ""
           print(self.config["pwd"],self.config["username"])
-          if is_success : self.db.update_cookies( self.cookies )
+          if is_success : 
+              self.db.update_cookies( self.cookies )
           return is_success,error 
 
       def is_logged_in(self) : 
           res = self.get("/Home/MainMenu")
           if "/Home/MainMenu" not in res.url : #reload failed
-              self.db.update_user("cookies",None)
+              self.db.update_user("_cookies","{}")
               return False
           return True 
 
@@ -1039,7 +1043,6 @@ class Eway1(Session) :
           print(response.text)
           if is_success : self.db.update_cookies( self.cookies )
           return is_success,error 
-
 
       def get_captcha(self):
           ewaybillTaxPayer = "p5k4foiqxa1kkaiyv4zawf0c"   
