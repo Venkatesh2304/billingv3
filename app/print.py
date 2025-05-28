@@ -102,12 +102,14 @@ def print_bills(request) :
     if len(bills) == 0 :
         return JsonResponse({"status" : "error" , "error" : "Zero Bills Selected to print"})
     qs = models.Bill.objects.filter(bill_id__in = bills)
+    
     #Remove already printed , if not loading sheet
-    if full_print_type != "loading_sheet" : 
+    if full_print_type  in ["both_copy","first_copy","double_first_copy","loading_sheet_salesman","reload_bill"] : 
         loading_sheets = list(qs.values_list("loading_sheet",flat=True).distinct())
         qs.update(print_time=None,loading_sheet=None,is_reloaded = True)
         models.SalesmanLoadingSheet.objects.filter(inum__in = loading_sheets).delete()
         qs = qs.all() #Refetch queryset
+
     if full_print_type == "reload_bill" : 
         return JsonResponse({"status" : "success"})
     context = { 'salesman':  data.get("salesman") , 'beat': data.get("beat") , 
@@ -134,7 +136,7 @@ def print_bills(request) :
 
         elif print_type == PrintType.SECOND_COPY :
             billing.Download(bills=bills,pdf=False, txt=True,cash_bills=[])
-            secondarybills.main(f'{FILES_DIR}/bill.txt', f'{FILES_DIR}/bill.docx',aztec.generate_aztec_code)
+            secondarybills.main(f'{FILES_DIR}/bill.txt', f'{FILES_DIR}/secondary_bill.docx',aztec.generate_aztec_code)
             
         elif print_type == PrintType.LOADING_SHEET :
             pdf_create.loading_sheet_pdf(billing.loading_sheet(bills),sheet_type=pdf_create.LoadingSheetType.Plain) 
@@ -152,10 +154,10 @@ def print_bills(request) :
             pass 
             
     print_files = { 
-        "both_copy" : ["bill.pdf","bill.docx"],
+        "both_copy" : ["secondary_bill.docx","bill.pdf"],
         "first_copy" : ["bill.pdf"],
         "double_first_copy" : ["bill.pdf","bill.pdf"],
-        "second_copy" : ["bill.docx"],
+        "second_copy" : ["secondary_bill.docx"],
         "loading_sheet" : ["loading.pdf"],
         "loading_sheet_salesman" : ["loading.pdf","loading.pdf"]
     }
