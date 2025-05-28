@@ -112,9 +112,11 @@ class BaseIkea(Session) :
           super().__init__()
           self.headers.update({'accept': 'application/json, text/javascript, */*; q=0.01'})
           self.base_url = self.config["home"]
+          retry_count = 1
           while not self.is_logged_in() : 
-             print("Re-Login ikea") 
+             print(f"Retry Count : {retry_count} , Trying to Login ikea") 
              self.login()
+             retry_count += 1
 
       def get_buffer(self,relative_url) : 
           return super().get_buffer(self.IKEA_DOWNLOAD_REPORT_URL + relative_url)
