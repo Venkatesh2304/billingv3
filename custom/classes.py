@@ -543,6 +543,9 @@ class Billing(IkeaDownloader) :
         #return self.creditlock_data
 
     def Delivery(self):
+        if not self.config["auto_delivery_process"] : 
+            self.bills = []
+            return 
         delivery = get_curl("ikea/billing/getdelivery").send(self).json()["billHdBeanList"] or []
         if len(delivery) == 0 : 
            self.bills = []

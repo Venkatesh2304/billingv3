@@ -137,7 +137,7 @@ class BillSerializer(serializers.ModelSerializer):
     party = serializers.SlugField(source="bill.party.name", read_only=True)
     beat = serializers.SlugField(source="bill.beat", read_only=True)
     einvoice = serializers.SerializerMethodField()
-    delivered = serializers.SlugField(source="bill.delivered", read_only=True)
+    delivered = serializers.BooleanField(source="bill.delivered", read_only=True)
     class Meta:
         model = Bill
         fields = ["bill", "party", "date", "salesman", "beat","amt","print_time","print_type","einvoice","delivered"]
