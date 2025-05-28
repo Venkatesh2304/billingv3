@@ -104,6 +104,7 @@ class BaseIkea(Session) :
           response = self.post("/rsunify/app/user/authenSuccess",{})
           if response.status_code == 200 : 
              self.logger.info("Logged in successfully")
+             print("Login Success")
              self.db.update_cookies(self.cookies)
           else : 
              raise Exception("Login Failed")
