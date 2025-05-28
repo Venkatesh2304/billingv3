@@ -32,6 +32,7 @@ import json
 from functools import wraps
 from django.http import JsonResponse, HttpResponseNotModified
 import app.enums as enums
+from billingv3.settings import FILES_DIR 
 
 @api_view(["GET"]) 
 def cheque_match(request,bank_id) : 
@@ -177,10 +178,10 @@ def push_collection(request) :
     f.seek(0)
     res = billing.upload_manual_collection(f)
     cheque_upload_status = pd.read_excel(billing.download_file(res["ul"]))
-    cheque_upload_status.to_excel("cheque_upload_status.xlsx")
+    cheque_upload_status.to_excel(f"{FILES_DIR}/cheque_upload_status.xlsx")
     sucessfull_coll = cheque_upload_status[cheque_upload_status["Status"] == "Success"]
     settle_coll:pd.DataFrame = billing.download_settle_cheque() # type: ignore
-    settle_coll.to_excel("settle_cheque.xlsx")
+    settle_coll.to_excel(f"{FILES_DIR}/settle_cheque.xlsx")
     if "CHEQUE NO" not in settle_coll.columns : 
         return JsonResponse({"status" : "error", "file" :"cheque_upload_status.xlsx"})
 
@@ -192,13 +193,13 @@ def push_collection(request) :
     res = billing.upload_settle_cheque(f)
     bytes_io = billing.download_file(res["ul"])
     cheque_settlement = pd.read_excel(bytes_io)
-    cheque_settlement.to_excel("cheque_settlement.xlsx")
+    cheque_settlement.to_excel(f"{FILES_DIR}/cheque_settlement.xlsx")
     for _,row in sucessfull_coll.iterrows() : 
         chq_no = row["Chq/DD No"]
         bill_no = row["BillNumber"]
         models.BankStatement.objects.get(id = chq_no).all_collection.filter(bill_id = bill_no).update(pushed = True)
     sync_reports(limits = {"collection" : None})
-    with pd.ExcelWriter(open("push_cheque_ikea.xlsx","wb+"), engine='xlsxwriter') as writer:
+    with pd.ExcelWriter(open(f"{FILES_DIR}/push_cheque_ikea.xlsx","wb+"), engine='xlsxwriter') as writer:
         cheque_upload_status.to_excel(writer,sheet_name="Manual Collection")
         cheque_settlement.to_excel(writer,sheet_name="Cheque Settlement")
     return JsonResponse({"status" : "success", "file" :"push_cheque_ikea.xlsx"})

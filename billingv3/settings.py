@@ -113,6 +113,7 @@ WSGI_APPLICATION = "billingv3.wsgi.application"
 #     }
 # }
 
+app_user = os.environ.get('app_user')
 
 DATABASES_CONFIG = {
     "a1" : "hul_devaki" , 
@@ -120,11 +121,12 @@ DATABASES_CONFIG = {
     "lakme_rural" : "lakme_rural" ,
 }
 
+FILES_DIR = f"files/{app_user}"
 
 DATABASES = {
     'default': {
         'ENGINE':   'django.db.backends.postgresql',
-        'NAME':     DATABASES_CONFIG[os.environ.get('app_user')],
+        'NAME':     DATABASES_CONFIG[app_user],
         'USER':     'postgres',
         'PASSWORD': 'Ven2004',
         'HOST':     'localhost',

@@ -32,6 +32,7 @@ import json
 from functools import wraps
 from django.http import JsonResponse, HttpResponseNotModified
 import app.enums as enums
+from billingv3.settings import FILES_DIR 
 
 class PrintType(Enum):
         FIRST_COPY = "first_copy"
@@ -80,11 +81,13 @@ def einvoice_upload(einvoice_service,einv_qs) :
     failed_inums = list(set(failed_inums) - set(processed_bills))
     return ( err == ""  , err , failed_inums )
 
+
+
 @api_view(["POST"])
 def print_bills(request) : 
     data = request.data
     full_print_type = data.get("print_type")
-     
+    
     print_downloads = { 
         "both_copy" : [PrintType.FIRST_COPY, PrintType.SECOND_COPY],
         "first_copy" : [PrintType.FIRST_COPY],
@@ -93,7 +96,6 @@ def print_bills(request) :
         "loading_sheet" : [PrintType.LOADING_SHEET],
         "loading_sheet_salesman" : [PrintType.LOADING_SHEET_SALESMAN]
     }
-
     billing = Billing()
     bills = data.get("bills",[])
     bills.sort()
@@ -106,10 +108,8 @@ def print_bills(request) :
         qs.update(print_time=None,loading_sheet=None,is_reloaded = True)
         models.SalesmanLoadingSheet.objects.filter(inum__in = loading_sheets).delete()
         qs = qs.all() #Refetch queryset
-
     if full_print_type == "reload_bill" : 
         return JsonResponse({"status" : "success"})
-
     context = { 'salesman':  data.get("salesman") , 'beat': data.get("beat") , 
                 'party' : data.get("party") , 'inum' : "SM" + bills[0] }
     
@@ -123,17 +123,18 @@ def print_bills(request) :
                 (success,einvoice_upload_error,failed_inums) = einvoice_upload(einvoice_service,einv_qs)
             else : 
                 return JsonResponse({"status" : "einvoice_login"})
-
+            
     for print_type in print_downloads[full_print_type] :
         if print_type == PrintType.FIRST_COPY : 
             billing.Download(bills=bills,pdf=True, txt=False,cash_bills=[])
-            pdf_create.remove_blank_pages_from_first_copy("bill.pdf")
-            aztec.add_aztec_codes_to_pdf("bill.pdf","bill.pdf",PrintType.FIRST_COPY)
+            bill_pdf_path = os.path.join(FILES_DIR, "bill.pdf")
+            pdf_create.remove_blank_pages_from_first_copy(bill_pdf_path)
+            aztec.add_aztec_codes_to_pdf(bill_pdf_path,bill_pdf_path,PrintType.FIRST_COPY)
             qs.update(print_type = print_type.value,print_time = datetime.datetime.now())
 
         elif print_type == PrintType.SECOND_COPY :
             billing.Download(bills=bills,pdf=False, txt=True,cash_bills=[])
-            secondarybills.main('bill.txt', 'bill.docx',aztec.generate_aztec_code)
+            secondarybills.main(f'{FILES_DIR}/bill.txt', f'{FILES_DIR}/bill.docx',aztec.generate_aztec_code)
             
         elif print_type == PrintType.LOADING_SHEET :
             pdf_create.loading_sheet_pdf(billing.loading_sheet(bills),sheet_type=pdf_create.LoadingSheetType.Plain) 
@@ -142,8 +143,9 @@ def print_bills(request) :
         elif print_type == PrintType.LOADING_SHEET_SALESMAN :
             pdf_create.loading_sheet_pdf(billing.loading_sheet(bills), 
                                         sheet_type=pdf_create.LoadingSheetType.Salesman,
-                                                    context=context) 
-            aztec.add_aztec_codes_to_pdf("loading.pdf","loading.pdf",PrintType.LOADING_SHEET_SALESMAN)
+                                                    context=context)
+            loading_pdf_path = os.path.join(FILES_DIR, "loading.pdf")
+            aztec.add_aztec_codes_to_pdf(loading_pdf_path,loading_pdf_path,PrintType.LOADING_SHEET_SALESMAN)
             loading_sheet = models.SalesmanLoadingSheet.objects.create(**context)
             qs.update(print_type = print_type.value,print_time = datetime.datetime.now(),loading_sheet = loading_sheet)
         else : 
@@ -160,12 +162,13 @@ def print_bills(request) :
     
     merger = PdfMerger()
     for file in print_files[full_print_type] :
+        file = os.path.join(FILES_DIR, file)
         if file.endswith(".docx") : 
             os.system(f"libreoffice --headless --convert-to pdf {file}")
             file = file.replace(".docx",".pdf") 
         with open(file, "rb") as pdf_file:
             merger.append(pdf_file)
-    merger.write("bill.pdf")
+    merger.write(f"{FILES_DIR}/bill.pdf")
     merger.close()
     
     return JsonResponse({"status" : "success" , "error" : einvoice_upload_error })

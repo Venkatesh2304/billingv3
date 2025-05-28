@@ -14,3 +14,4 @@ db2.sqlite3
 *.html
 bills/
 voice_notes/
+files/

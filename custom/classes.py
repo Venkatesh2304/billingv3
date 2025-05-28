@@ -33,6 +33,7 @@ from .std import add_image_to_bills
 from urllib.parse import urlencode
 import requests 
 from PyPDF2 import PdfReader
+from billingv3.settings import FILES_DIR
 
 class IkeaPasswordExpired(Exception) :
     pass
@@ -616,18 +617,18 @@ class Billing(IkeaDownloader) :
 
         for group in self.group_consecutive_bills(cash_bills) :
             if pdf : pdfs.append( add_image_to_bills( self.download_file( get_bill_durl(group[0],group[-1],"pdf")) ,
-                                                          'cash_bill.png' , 8, 24, 1.9, 1.9 ))
+                                                          'cash_bill.png' , 8, 24, 1.9, 1.9 ) )
 
         if pdf :     
             merger = PdfMerger()
             for pdf_bytesio in pdfs:
                 pdf_bytesio.seek(0)  #Ensure each BytesIO stream is at the start
                 merger.append(pdf_bytesio)
-            with open("bill.pdf", "wb+") as f:
+            with open(f"{FILES_DIR}/bill.pdf", "wb+") as f:
                 merger.write(f)
             merger.close()
         if txt : 
-            with open("bill.txt", "wb+") as merged_file:
+            with open(f"{FILES_DIR}/bill.txt", "wb+") as merged_file:
                 for text_bytesio in txts :
                     text_bytesio.seek(0) 
                     merged_file.write(text_bytesio.read())

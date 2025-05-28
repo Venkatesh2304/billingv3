@@ -15,6 +15,7 @@ from app.common import bulk_raw_insert, query_db
 from app.sync import sync_reports
 from custom.classes import Billing
 from rest_framework.decorators import api_view
+from billingv3.settings import FILES_DIR 
 
 ProcessStatus = IntEnum("ProcessStatus",(("NotStarted",0),("Success",1),("Started",2),("Failed",3)))
 
@@ -188,9 +189,8 @@ def outstanding(request) :
     outstanding.sort_values("days",ascending=False).to_excel(writer, sheet_name='ALL BILLS',index=False)
     writer.close()
     output.seek(0)
-    with open("outstanding.xlsx","wb+") as f : f.write(output.getvalue())
+    with open(f"{FILES_DIR}/outstanding.xlsx","wb+") as f : f.write(output.getvalue())
     return JsonResponse({"status":"success"})
-
 
 @api_view(["POST"])
 def pending_sheet(request) :
@@ -231,5 +231,5 @@ def pending_sheet(request) :
             writer.add_page(page)
         if len(reader.pages) % 2 != 0:
             writer.add_blank_page()
-    writer.write("pending_sheet.pdf")
+    writer.write(f"{FILES_DIR}/pending_sheet.pdf")
     return JsonResponse({"status":"success"})

@@ -7,11 +7,12 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle , Spacer
 from reportlab.lib import colors
 from enum import Enum 
 import pymupdf
+from billingv3.settings import FILES_DIR
 
 # Set font size and cell height
 S = 10  # Font size
 H = 6   # Cell height
-OUTPUT_LOADING_PDF_FILE = "loading.pdf"
+OUTPUT_LOADING_PDF_FILE = f"{FILES_DIR}/loading.pdf"
 LoadingSheetType = Enum("LoadingSheetType","Salesman Plain")
 
 class PDF(FPDF):
