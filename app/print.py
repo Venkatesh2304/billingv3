@@ -162,7 +162,7 @@ def print_bills(request) :
     
     merger = PdfMerger()
     for file in print_files[full_print_type] :
-        file = os.path.join(FILES_DIR, file)
+        file = f"{FILES_DIR}/{file}"
         if file.endswith(".docx") : 
             os.system(f"libreoffice --headless --convert-to pdf {file}")
             file = file.replace(".docx",".pdf") 
