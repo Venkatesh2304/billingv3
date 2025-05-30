@@ -136,8 +136,10 @@ def load_summary(request) :
     df = df[["cbu","desc","purchase_qty","load_qty","diff"]]
     bytesio = BytesIO()
     with pd.ExcelWriter(bytesio, engine='xlsxwriter') as writer:
+        df.to_excel(writer, index=False, sheet_name='Summary')
         df[df["diff"] != 0].to_excel(writer, index=False, sheet_name='Mismatch')
         df[df["diff"] == 0].to_excel(writer, index=False, sheet_name='Correct')
+        
     bytesio.seek(0)
     return FileResponse(
         bytesio,
