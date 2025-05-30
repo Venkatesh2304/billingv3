@@ -95,7 +95,7 @@ def scan_product(request) :
         except : 
             return JsonResponse({"status": "error", "message": "Invalid Barcode" , "status_code": "invalid_barcode"})
     else : 
-        cbu = barcode
+        cbu = barcode.upper().strip()
         alphabet = string.ascii_lowercase + string.digits
         barcode = ''.join(secrets.choice(alphabet) for _ in range(20))
     product , created = models.TruckProduct.objects.get_or_create(
