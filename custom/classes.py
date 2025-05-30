@@ -179,6 +179,9 @@ class IkeaDownloader(BaseIkea) :
            }
           return self.post("/rsunify/app/chequeMaintenance/chequeUpload",files = files,data = {}).json()
 
+      def product_wise_purchase(self,fromd,tod) : 
+          return self.report("ikea/product_wise_purchase",r'(":val1":").{10}(",":val2":").{10}',(fromd.strftime("%d/%m/%Y"),tod.strftime("%d/%m/%Y")))
+      
       def stock_ledger(self,fromd,tod) : 
           return self.report("ikea/stock_ledger",r'(":val3":").{10}(",":val4":").{10}',(fromd.strftime("%d/%m/%Y"),tod.strftime("%d/%m/%Y")))
       

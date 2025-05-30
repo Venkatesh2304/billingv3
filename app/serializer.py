@@ -189,3 +189,14 @@ class BankSerializer(WritableNestedModelSerializer):
                     "cheque_entry","cheque_status","collection"]
         # readonly_fields = ["amt","desc","date","ref","bank","idx","id"]
         # list_filter = ["date","type","bank"]
+
+
+# class LoadSerializer(WritableNestedModelSerializer):
+#     class TruckPurchaseSerializer(serializers.Serializer):
+#         class Meta:
+#             model = TruckPurchase
+#             fields = ['inum']
+#     purchase = TruckPurchaseSerializer(many=True, read_only=False)
+#     class Meta:
+#         model = TruckLoad
+#         fields = [""]

@@ -83,6 +83,8 @@ def curl_replace(pat,replaces,str) :
     return re.sub(pat,replace_pat,str).replace("%%%","") 
       
 if __name__ == "__main__" : 
+
+
     ParsedCommand = namedtuple(
         "ParsedCommand",
         [

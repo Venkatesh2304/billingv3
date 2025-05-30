@@ -481,6 +481,27 @@ class PendingSheetBill(models.Model) :
     def status(self) : 
         return bool(self.outstanding_on_bill is not None)
 
+
+
+class TruckLoad(models.Model) :
+     date = models.DateField(auto_now_add=True)
+     completed = models.BooleanField(default=False,db_default=False)
+
+class TruckPurchase(models.Model) : 
+    inum = models.CharField(max_length=30,primary_key=True)
+    load = models.ForeignKey("app.TruckLoad", on_delete=models.DO_NOTHING, related_name="purchases",null=True)
+    
+class PurchaseProduct(models.Model) :
+    inum = models.ForeignKey("app.TruckPurchase", on_delete=models.CASCADE, related_name="products")
+    cbu = models.CharField(max_length=20)
+    sku = models.CharField(max_length=20)
+    qty = models.IntegerField()
+
+class TruckProduct(models.Model) :
+     barcode = models.CharField(max_length=300,primary_key=True)
+     cbu = models.CharField(max_length=20)
+     load = models.ForeignKey("app.TruckLoad", on_delete=models.DO_NOTHING, related_name="truck_products")
+     
 # class SalesmanCollectionBill(models.Model) : 
 #     chq = ForeignKey("app.SalesmanCollection",on_delete=models.CASCADE,related_name="bills")
 #     inum = ForeignKey("app.Sales",db_index=False,db_constraint=False,on_delete=models.DO_NOTHING)

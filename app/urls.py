@@ -1,6 +1,6 @@
 from app.billing import billing_view
 from app.print import print_bills
-from app import bank, report
+from app import bank, report ,load
 from . import views
 from django.urls import path
 from django.views.decorators.cache import cache_page
@@ -44,6 +44,15 @@ urlpatterns = [
     path('basepack/', report.basepack , name='basepack'),
     path('outstanding_report/', report.outstanding , name='outstanding_report'),
     path('pending_sheet/', report.pending_sheet , name='pending_sheet'),
+
+    path('upload_purchase/', load.upload_purchase_invoice , name='upload_purchase'),
+    path('get_last_load/', load.get_last_load , name='get_last_load'),
+    path('map_load/', load.map_purchase_to_load , name='map_purchase_to_load'),
+    path('finish_load/', load.finish_load , name='finish_load'),
+    path('load_summary/', load.load_summary , name='load_summary'),
+    path('scan_product/', load.scan_product , name='scan_product'),
+
+
 
     # path('party_outstanding/', views.get_party_outstanding, name='party_outstanding'),
     # path('billautocomplete/', BillAutocomplete.as_view(), name='billautocomplete'),

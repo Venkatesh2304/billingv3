@@ -42,19 +42,11 @@ pd.options.display.float_format = '{:.2f}'.format
 from app.models import Orders,OrderProducts
 cur = connection.cursor()
 cur.execute("""
-WITH ranked AS (
-    SELECT ctid, ROW_NUMBER() OVER (PARTITION BY inum ORDER BY ctid) AS rn
-    FROM app_adjustment
-)
-DELETE FROM app_adjustment
-WHERE ctid IN (
-    SELECT ctid FROM ranked WHERE rn > 1
-);
+
 """
 )
 cur.execute("select * from app_salesmanloadingsheet")
 asd
-
 
 cur.execute("delete from app_billingprocessstatus")
 cur.execute("update app_bankcollection set bank_entry_id = NULL where cheque_entry_id is not NULL")
