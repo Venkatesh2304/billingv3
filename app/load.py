@@ -132,13 +132,10 @@ def load_summary(request) :
     load_products = pd.DataFrame(Counter(load_cbu).items(),columns=["cbu","load_qty"])
     df = pd.merge(purchase_products, load_products, on="cbu", how="outer").fillna(0)
     df["diff"] = df["purchase_qty"] - df["load_qty"]
-    df["desc"] = ""
-    # df = pd.merge(df, product_master[["sku","desc"]], on="sku", how="left") 
+    df = pd.merge(df, product_master[["sku","desc"]].drop_duplicates(subset=["sku"]) , on="sku", how="left") 
     df = df[["cbu","desc","purchase_qty","load_qty","diff"]]
     bytesio = BytesIO()
     with pd.ExcelWriter(bytesio, engine='xlsxwriter') as writer:
-        purchase_products1.to_excel(writer, index=False, sheet_name='Purchase Products')
-        purchase_products.to_excel(writer, index=False, sheet_name='Purchase Summary')
         df[df["diff"] != 0].to_excel(writer, index=False, sheet_name='Mismatch')
         df[df["diff"] == 0].to_excel(writer, index=False, sheet_name='Correct')
     bytesio.seek(0)
