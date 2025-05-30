@@ -126,6 +126,7 @@ def load_summary(request) :
     inums = list(load.purchases.values_list("inum",flat=True))
     products = models.PurchaseProduct.objects.filter(inum_id__in=inums).values_list("cbu","sku","qty")
     purchase_products = pd.DataFrame(products,columns=["cbu","sku","purchase_qty"])
+    purchase_products1 = purchase_products.copy()
     purchase_products = purchase_products.groupby(["cbu","sku"]).sum().reset_index()
     load_cbu = list(models.TruckProduct.objects.filter(load=load).values_list("cbu",flat=True))
     load_products = pd.DataFrame(Counter(load_cbu).items(),columns=["cbu","load_qty"])
@@ -135,6 +136,8 @@ def load_summary(request) :
     df = df[["cbu","desc","purchase_qty","load_qty","diff"]]
     bytesio = BytesIO()
     with pd.ExcelWriter(bytesio, engine='xlsxwriter') as writer:
+        purchase_products1.to_excel(writer, index=False, sheet_name='Purchase Products')
+        purchase_products.to_excel(writer, index=False, sheet_name='Purchase Summary')
         df[df["diff"] != 0].to_excel(writer, index=False, sheet_name='Mismatch')
         df[df["diff"] == 0].to_excel(writer, index=False, sheet_name='Correct')
     bytesio.seek(0)
