@@ -85,7 +85,7 @@ def finish_load(request) :
 
 @api_view(["POST"])
 def scan_product(request) : 
-    barcode = request.data.get("code")
+    barcode = request.data.get("code").upper().strip().strip("\n")
     scanned = request.data.get("scanned")
     cbu = None 
     load=models.TruckLoad.objects.filter(completed=False).last()
