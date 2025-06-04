@@ -87,21 +87,30 @@ def finish_load(request) :
 def scan_product(request) : 
     barcode = request.data.get("code").upper().strip().strip("\n")
     scanned = request.data.get("scanned")
+    qty = request.data.get("qty",1)
     cbu = None 
-    load=models.TruckLoad.objects.filter(completed=False).last()
+    barcodes = []
+    load = models.TruckLoad.objects.filter(completed=False).last()
+    
     if scanned : 
         try : 
             cbu = barcode.split("(241)")[1].split("(10)")[0].strip().upper()
         except : 
             return JsonResponse({"status": "error", "message": "Invalid Barcode" , "status_code": "invalid_barcode"})
+        barcodes.append(barcode)
     else : 
         cbu = barcode.upper().strip()
         alphabet = string.ascii_lowercase + string.digits
-        barcode = ''.join(secrets.choice(alphabet) for _ in range(20))
-    product , created = models.TruckProduct.objects.get_or_create(
-        barcode=barcode,
-        defaults={"load_id" : load.id , "cbu": cbu}
-    )
+        for i in range(qty) :
+            barcodes.append( ''.join(secrets.choice(alphabet) for _ in range(20)) )
+    
+    product,created = None,None
+    for barcode in barcodes : 
+        product , created = models.TruckProduct.objects.get_or_create(
+            barcode=barcode,
+            defaults={"load_id" : load.id , "cbu": cbu}
+        ) 
+
     if created : 
         return JsonResponse({"status": "success", "message": "Product added", "cbu": cbu, 
                              "status_code": "product_added"})
