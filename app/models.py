@@ -189,7 +189,7 @@ class Party(models.Model) :
       code = CharField(max_length=10,primary_key=True)
       master_code = CharField(max_length=10,null=True,blank=True)
       name = CharField(max_length=50,null=True,blank=True)
-      type = CharField(db_default="shop",max_length=10)
+      type = CharField(db_default="shop",max_length=10,null=True)
       addr = CharField(max_length=150,blank=True,null=True)
       pincode = IntegerField(blank=True,null=True)
       ctin = CharField(max_length=20,null=True,blank=True)
