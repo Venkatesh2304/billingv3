@@ -9,8 +9,7 @@ def sync_beat_parties_ikea(force = True) :
     newly_synced = sync_reports(limits={"collection":today}) 
     
 
-
-sync_reports(limits={"collection":None},min_days_to_sync={"collection" : 10})
+sync_reports(limits={"party":None,"beat":None},min_days_to_sync={"collection" : 10,"beat":10})
 exit(0)
 #create 5 simaulneous threads of sync_beat_parties_ikea()
 threads = []

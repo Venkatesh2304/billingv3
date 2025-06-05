@@ -122,7 +122,6 @@ def scan_product(request) :
             return JsonResponse({"status": "error", "message": "Product Already Scanned", "cbu": cbu, 
                              "status_code": "product_already_scanned"})
         
-
 @api_view(["GET"])
 def load_summary(request) : 
     tod = datetime.date.today()
