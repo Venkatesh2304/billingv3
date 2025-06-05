@@ -170,7 +170,7 @@ def PartyInsert(party) :
     bulk_raw_insert("party",pm,is_partial_upsert=True,index="code")
 
 def BeatInsert(beats) : 
-    bulk_raw_insert("beat",beats)
+    bulk_raw_insert("beat",beats,index=["id"])
 
 # query_db("update app_inventory set qty = -abs(qty) where bill_id is not null and (select type from app_sales where inum=bill_id) in ('sales','claimservice') ")
 # query_db("update app_inventory set qty = abs(qty) where bill_id is not null and (select type from app_sales where inum=bill_id) not in ('sales','claimservice') ")
