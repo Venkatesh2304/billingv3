@@ -110,7 +110,11 @@ def bank_statement_upload(request) :
         df = df.iloc[skiprows+1:]
         return df,acc_no 
     
-    ACC_BANKS = {"_00000042540766421":"SBI OD",'="1889135000001946"':"KVB CA","_00000042536033659":"SBI CA"}
+    ACC_BANKS = {"_00000042540766421":"SBI OD",
+                 '="1889135000001946"':"KVB CA",
+                 "_00000044030674591" : "SBI LAKME",
+                 "_00000042536033659":"SBI CA",
+                 }
     acc = None 
     if bank_name == "sbi" : 
         df,acc = skiprows_excel(excel_file,"Txn Date",col_number=0,sep = "\t")

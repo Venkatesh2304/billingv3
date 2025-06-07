@@ -31,6 +31,7 @@ urlpatterns = [
     path('einvoice_login/', views.einvoice_login, name='einvoice_login'),
     path('salesman/', views.salesman_names, name='salesman'),
     path('party/', views.party_names, name='party'),
+    path('einvoice_status/', views.einvoice_status, name='einvoice_status'),
 
     path('cheque_match/<str:bank_id>/', bank.cheque_match, name='cheque_match'),
     path('bank_collection/<str:bank_id>/', bank.bank_collection, name='bank_collection'),

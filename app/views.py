@@ -91,4 +91,11 @@ def einvoice_login(request) :
         captcha = request.data.get("captcha").strip().upper()
         is_success , error = einvoice_service.login(captcha)
         return JsonResponse({"status" : "success" if is_success else "error", "error" : error})
-        
+
+@api_view(["GET","POST"])
+def einvoice_status(request) : 
+    einv,_ = models.Settings.objects.get_or_create(key="einvoice", defaults={"status": True})
+    if request.method == "POST":
+        einv.status = request.data.get("enabled")
+    einv.save()
+    return JsonResponse({"enabled": einv.status})

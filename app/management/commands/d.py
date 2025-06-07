@@ -1,13 +1,13 @@
 import datetime 
 import threading
 
+from app import models
 from app.sync import sync_reports
 
 def sync_beat_parties_ikea(force = True) :
     today = datetime.date.today() if not force else (datetime.date.today() + datetime.timedelta(days=1))
     #,"adjustment":today,"collection" : today,"beat": today,"party" : today,"beat" : today
     newly_synced = sync_reports(limits={"collection":today}) 
-    
 
 sync_reports(limits={"party":None,"beat":None},min_days_to_sync={"collection" : 10,"beat":10})
 exit(0)
