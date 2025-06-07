@@ -56,7 +56,7 @@ def refresh_outstanding(func) :
             # HAVING ABS(SUM(amt)) > 1
     return decorated_function
 
-# @refresh_outstanding
+@refresh_outstanding
 def SalesInsert(sales_reg,gst=None,permanent=False) : 
    
    if len(sales_reg.index) == 0 : return 
