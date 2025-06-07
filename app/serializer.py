@@ -191,6 +191,12 @@ class BankSerializer(WritableNestedModelSerializer):
         # list_filter = ["date","type","bank"]
 
 
+class BeatSerializer(serializers.ModelSerializer) : 
+      class Meta:
+        model = Beat
+        fields = ["id", "name", "salesman_name","days","plg"]
+ 
+
 # class LoadSerializer(WritableNestedModelSerializer):
 #     class TruckPurchaseSerializer(serializers.Serializer):
 #         class Meta:

@@ -104,3 +104,7 @@ class OutstandingViewSet(viewsets.ModelViewSet):
     serializer_class = OutstandingSerializer
     filterset_fields = ['beat','party']
     
+class BeatViewSet(viewsets.ModelViewSet):
+    queryset = Beat.objects.all()
+    serializer_class = BeatSerializer
+    filterset_fields = {"days" : ["icontains"]}

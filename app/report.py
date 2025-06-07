@@ -203,6 +203,11 @@ def pending_sheet(request) :
     else :
         queryset = queryset.filter(name__contains = "WHOLESALE")
     
+    #Filter queryset if beats is not empty in POST
+    beats = request.data.get("beats")
+    if beats :
+        queryset = queryset.filter(id__in = beats)
+    
     beat_ids = { str(id) for id in queryset.values_list("id",flat=True) }
     beat_maps = { beat.name : (beat.salesman_name,beat.id) for beat in queryset.all() }
     billing = Billing()

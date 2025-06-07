@@ -20,6 +20,7 @@ router.register(r'bill', BillViewSet)
 router.register(r'cheque', ChequeViewSet)
 router.register(r'bank', BankViewSet)
 router.register(r'outstanding', OutstandingViewSet)
+router.register(r'beat', BeatViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
