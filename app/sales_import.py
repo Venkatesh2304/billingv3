@@ -40,7 +40,7 @@ def refresh_outstanding(func) :
         func(*args,**kwargs)
         query_db('DELETE FROM app_outstanding')
         query_db('''
-            INSERT INTO app_outstanding
+            INSERT INTO app_outstanding (party_id, inum, balance, beat, date)
             SELECT party_id, inum, SUM(amt) AS balance, MAX(beat) AS beat, MIN(date) AS date 
             FROM (
               SELECT party_id, inum, '2023-04-01' AS date, amt, beat FROM app_openingbalance

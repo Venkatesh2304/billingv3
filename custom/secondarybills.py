@@ -1,10 +1,13 @@
 #import win32api
+import os
 from prettytable import PrettyTable,ALL
 from docx import Document
 from docx.shared import Inches,Length,Pt,Cm
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 def collection(file,document,barcode_generator) :
+ app_user = os.environ.get('app_user')
+ CONFIG_FILE = f'config_{app_user}.txt'
  f=open(file)
  x1=f.read()
  f.close()
@@ -14,7 +17,7 @@ def collection(file,document,barcode_generator) :
  bill=''
  invoice=[]
  name=[]
- f=open('config.txt')
+ f=open(CONFIG_FILE)
  config=eval(f.read())
  f.close()
  
@@ -87,7 +90,7 @@ def collection(file,document,barcode_generator) :
    #  barcode.paragraph_format.space_before = Cm(-1)
 
 
-    f=open('config.txt')
+    f=open(CONFIG_FILE)
     try : 
        lines = int(eval(f.read())['lines'])
     except : 
