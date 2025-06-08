@@ -410,7 +410,7 @@ class BankCollection(models.Model) :
           unique_together = ('bill', 'cheque_entry', 'bank_entry')
 
 class BankStatement(models.Model) : 
-    BANK_CHOICES = ["KVB CA","SBI CA","SBI OD"]
+    BANK_CHOICES = ["KVB CA","SBI CA","SBI OD","SBI LAKME"]
     date = models.DateField()
     idx = models.IntegerField()
     id = models.CharField(max_length=15,primary_key=True)
