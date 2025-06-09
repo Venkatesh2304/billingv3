@@ -43,15 +43,16 @@ def extract_product_quantities(bytesio):
     qtys = [qty.split("TAX")[0] for qty in qtys if qty]
     qtys = [qty for qty in qtys if qty]
     qtys = qtys[: len(codes)]
+    mrps = [int(mrp.split(".")[0]) for mrp in qtys[1::2]]
     qtys = [int(qty.split("/")[0].strip()) for qty in qtys[::2]]
-    return inum , list(zip(cbu, sku, qtys))
+    return inum , list(zip(cbu, sku, mrps,qtys))
 
 @api_view(["POST"])
 def upload_purchase_invoice(request) :
     file = request.FILES.get("file") 
     bytesio = BytesIO(file.read())
     inum , product_quantities = extract_product_quantities(bytesio)
-    df = pd.DataFrame(product_quantities, columns=["cbu", "sku", "qty"])
+    df = pd.DataFrame(product_quantities, columns=["cbu", "sku", "mrp","qty"])
     df["inum_id"] = inum
     pur,_ = models.TruckPurchase.objects.get_or_create(inum=inum)
     models.PurchaseProduct.objects.filter(inum_id=inum).delete()
@@ -83,44 +84,86 @@ def finish_load(request) :
     models.TruckLoad.objects.filter(completed = False).update(completed=True)
     return JsonResponse({"status": "success"})
 
+@api_view(["GET"])
+def get_cbu_codes(request) : 
+    load = models.TruckLoad.objects.filter(completed = False).last()
+    cbu_codes = models.PurchaseProduct.objects.filter(inum__load=load).values_list("cbu",flat=True).distinct()
+    return JsonResponse(list(cbu_codes),safe=False)
+
+@api_view(["POST"])
+def barcode_to_cbu(request) : 
+    barcode = request.data.get("barcode").upper().strip()
+    obj = models.Barcode.objects.get(barcode=barcode)
+    return JsonResponse({"cbu" : obj.cbu if obj else None })
+
+
+@api_view(["POST"])
+def map_barcode_to_cbu(request) : 
+    barcode = request.data.get("barcode").upper().strip()
+    cbu = request.data.get("cbu").strip().upper()
+    models.Barcode.objects.create(barcode=barcode,cbu=cbu).save()
+    return JsonResponse({"status": "success", "message": "Barcode mapped to CBU successfully"})
+
+
+@api_view(["POST"])
+def get_product(request) : 
+    cbu = request.data.get("cbu").strip().upper()
+    # cbu = barcode.split("(241)")[1].split("(10)")[0].strip().upper()
+    load = models.TruckLoad.objects.filter(completed = False).last()
+    products = models.PurchaseProduct.objects.filter(inum__load=load,cbu=cbu)
+    mrp = models.PurchaseProduct.objects.filter(cbu = cbu).first().mrp
+    purchase_qty = products.aggregate(total_qty=models.Sum("qty"))["total_qty"] or 0 
+    already_scanned_qty = models    .TruckProduct.objects.filter(load=load,cbu=cbu).aggregate(total_qty=models.Sum("qty"))["total_qty"] or 0 
+    return JsonResponse({
+        "cbu": cbu ,
+        "mrp": mrp ,
+        "rem_qty": purchase_qty - already_scanned_qty
+    })
+
 @api_view(["POST"])
 def scan_product(request) : 
-    barcode = request.data.get("code").upper().strip().strip("\n")
-    scanned = request.data.get("scanned")
-    qty = request.data.get("qty",1)
-    cbu = None 
-    barcodes = []
+    products = request.data.get("products")
     load = models.TruckLoad.objects.filter(completed=False).last()
+    for product in products : 
+        models.TruckProduct.objects.create(
+            load=load,cbu=product["cbu"],qty=product["qty"]).save()
+    return JsonResponse({"status": "success", "message": "Products scanned successfully"})
+    # barcode = request.data.get("code").upper().strip().strip("\n")
+    # scanned = request.data.get("scanned")
+    # qty = request.data.get("qty",1)
+    # cbu = None 
+    # barcodes = []
+    # load = models.TruckLoad.objects.filter(completed=False).last()
     
-    if scanned : 
-        try : 
-            cbu = barcode.split("(241)")[1].split("(10)")[0].strip().upper()
-        except : 
-            return JsonResponse({"status": "error", "message": "Invalid Barcode" , "status_code": "invalid_barcode"})
-        barcodes.append(barcode)
-    else : 
-        cbu = barcode.upper().strip()
-        alphabet = string.ascii_lowercase + string.digits
-        for i in range(qty) :
-            barcodes.append( ''.join(secrets.choice(alphabet) for _ in range(20)) )
+    # if scanned : 
+    #     try : 
+    #         cbu = barcode.split("(241)")[1].split("(10)")[0].strip().upper()
+    #     except : 
+    #         return JsonResponse({"status": "error", "message": "Invalid Barcode" , "status_code": "invalid_barcode"})
+    #     barcodes.append(barcode)
+    # else : 
+    #     cbu = barcode.upper().strip()
+    #     alphabet = string.ascii_lowercase + string.digits
+    #     for i in range(qty) :
+    #         barcodes.append( ''.join(secrets.choice(alphabet) for _ in range(20)) )
     
-    product,created = None,None
-    for barcode in barcodes : 
-        product , created = models.TruckProduct.objects.get_or_create(
-            barcode=barcode,
-            defaults={"load_id" : load.id , "cbu": cbu}
-        ) 
+    # product,created = None,None
+    # for barcode in barcodes : 
+    #     product , created = models.TruckProduct.objects.get_or_create(
+    #         barcode=barcode,
+    #         defaults={"load_id" : load.id , "cbu": cbu}
+    #     ) 
 
-    if created : 
-        return JsonResponse({"status": "success", "message": "Product added", "cbu": cbu, 
-                             "status_code": "product_added"})
-    else : 
-        if product.load.id != load.id : 
-            return JsonResponse({"status": "error", "message": "Product Scanned in Previous Load", "cbu": cbu, 
-                             "status_code": "previous_load"})
-        else : 
-            return JsonResponse({"status": "error", "message": "Product Already Scanned", "cbu": cbu, 
-                             "status_code": "product_already_scanned"})
+    # if created : 
+    #     return JsonResponse({"status": "success", "message": "Product added", "cbu": cbu, 
+    #                          "status_code": "product_added"})
+    # else : 
+    #     if product.load.id != load.id : 
+    #         return JsonResponse({"status": "error", "message": "Product Scanned in Previous Load", "cbu": cbu, 
+    #                          "status_code": "previous_load"})
+    #     else : 
+    #         return JsonResponse({"status": "error", "message": "Product Already Scanned", "cbu": cbu, 
+    #                          "status_code": "product_already_scanned"})
         
 @api_view(["GET"])
 def load_summary(request) : 
@@ -136,8 +179,9 @@ def load_summary(request) :
     purchase_products = pd.DataFrame(products,columns=["cbu","sku","purchase_qty"])
     purchase_products1 = purchase_products.copy()
     purchase_products = purchase_products.groupby(["cbu","sku"]).sum().reset_index()
-    load_cbu = list(models.TruckProduct.objects.filter(load=load).values_list("cbu",flat=True))
-    load_products = pd.DataFrame(Counter(load_cbu).items(),columns=["cbu","load_qty"])
+    load_cbu = list(models.TruckProduct.objects.filter(load=load).values("cbu","qty"))
+    load_products = pd.DataFrame(load_cbu).rename(columns={"qty":"load_qty"})
+    #load_products = pd.DataFrame(Counter(load_cbu).items(),columns=["cbu","load_qty"])
     df = pd.merge(purchase_products, load_products, on="cbu", how="outer").fillna(0)
     df["diff"] = df["purchase_qty"] - df["load_qty"]
     df = pd.merge(df, product_master[["sku","desc"]].drop_duplicates(subset=["sku"]) , on="sku", how="left") 

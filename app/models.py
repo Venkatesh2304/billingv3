@@ -495,12 +495,18 @@ class PurchaseProduct(models.Model) :
     inum = models.ForeignKey("app.TruckPurchase", on_delete=models.CASCADE, related_name="products")
     cbu = models.CharField(max_length=20)
     sku = models.CharField(max_length=20)
+    mrp = models.IntegerField()
     qty = models.IntegerField()
 
 class TruckProduct(models.Model) :
+    #  barcode = models.CharField(max_length=300,primary_key=True)
+     cbu = models.CharField(max_length=20)
+     qty = models.IntegerField()
+     load = models.ForeignKey("app.TruckLoad", on_delete=models.DO_NOTHING, related_name="truck_products")
+     
+class Barcode(models.Model) : 
      barcode = models.CharField(max_length=300,primary_key=True)
      cbu = models.CharField(max_length=20)
-     load = models.ForeignKey("app.TruckLoad", on_delete=models.DO_NOTHING, related_name="truck_products")
      
 # class SalesmanCollectionBill(models.Model) : 
 #     chq = ForeignKey("app.SalesmanCollection",on_delete=models.CASCADE,related_name="bills")

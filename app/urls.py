@@ -50,9 +50,13 @@ urlpatterns = [
     path('upload_purchase/', load.upload_purchase_invoice , name='upload_purchase'),
     path('get_last_load/', load.get_last_load , name='get_last_load'),
     path('map_load/', load.map_purchase_to_load , name='map_purchase_to_load'),
+    path('get_product/', load.get_product , name='get_product'),
+    path('get_cbu_codes/', load.get_cbu_codes , name='get_cbu_codes'),
     path('finish_load/', load.finish_load , name='finish_load'),
     path('load_summary/', load.load_summary , name='load_summary'),
     path('scan_product/', load.scan_product , name='scan_product'),
+    path('barcode_to_cbu/', load.barcode_to_cbu , name='barcode_to_cbu'),
+    path('map_barcode_to_cbu/', load.map_barcode_to_cbu , name='map_barcode_to_cbu'),
 
 
 
