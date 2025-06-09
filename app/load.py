@@ -181,6 +181,7 @@ def load_summary(request) :
     purchase_products = purchase_products.groupby(["cbu","sku"]).sum().reset_index()
     load_cbu = list(models.TruckProduct.objects.filter(load=load).values("cbu","qty"))
     load_products = pd.DataFrame(load_cbu,columns=["cbu","qty"]).rename(columns={"qty":"load_qty"})
+    load_products = load_products.groupby("cbu").sum().reset_index()
     #load_products = pd.DataFrame(Counter(load_cbu).items(),columns=["cbu","load_qty"])
     df = pd.merge(purchase_products, load_products, on="cbu", how="outer").fillna(0)
     df["diff"] = df["purchase_qty"] - df["load_qty"]
