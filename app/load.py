@@ -175,8 +175,8 @@ def load_summary(request) :
     # product_master.to_excel("product_master.xlsx", index=False)
     load = models.TruckLoad.objects.filter(completed = False).last()
     inums = list(load.purchases.values_list("inum",flat=True))
-    products = models.PurchaseProduct.objects.filter(inum_id__in=inums).values_list("cbu","sku","qty")
-    purchase_products = pd.DataFrame(products,columns=["cbu","sku","purchase_qty"])
+    products = models.PurchaseProduct.objects.filter(inum_id__in=inums).values_list("cbu","sku","qty","mrp")
+    purchase_products = pd.DataFrame(products,columns=["cbu","sku","purchase_qty","mrp"])
     purchase_products1 = purchase_products.copy()
     purchase_products = purchase_products.groupby(["cbu","sku"]).sum().reset_index()
     load_cbu = list(models.TruckProduct.objects.filter(load=load).values("cbu","qty"))
@@ -186,7 +186,7 @@ def load_summary(request) :
     df = pd.merge(purchase_products, load_products, on="cbu", how="outer").fillna(0)
     df["diff"] = df["purchase_qty"] - df["load_qty"]
     df = pd.merge(df, product_master[["sku","desc"]].drop_duplicates(subset=["sku"]) , on="sku", how="left") 
-    df = df[["cbu","desc","purchase_qty","load_qty","diff"]]
+    df = df[["cbu","desc","mrp","purchase_qty","load_qty","diff"]]
     bytesio = BytesIO()
     with pd.ExcelWriter(bytesio, engine='xlsxwriter') as writer:
         df.to_excel(writer, index=False, sheet_name='Summary')
