@@ -110,6 +110,15 @@ class BaseIkea(Session) :
 
       def __init__(self) : 
           super().__init__()
+          self.ikea_initialize()
+
+      def change_user(self,user) :
+          self.user = user
+          self.fetch_config()
+          self.ikea_initialize()
+
+
+      def ikea_initialize(self) :
           self.headers.update({'accept': 'application/json, text/javascript, */*; q=0.01'})
           self.base_url = self.config["home"]
           retry_count = 1
@@ -198,7 +207,6 @@ class IkeaDownloader(BaseIkea) :
               date_series = pd.to_datetime(df[date_column],format="%d/%m/%Y")
           df[date_column] = date_series.dt.date
           return df 
-      
       
       def download_moc(self,fromd,tod,key,pat,sheet_name,date_column,is_slash=True,date_checker = None) :
           dfs = []

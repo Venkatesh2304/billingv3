@@ -46,6 +46,7 @@ urlpatterns = [
     path('basepack/', report.basepack , name='basepack'),
     path('outstanding_report/', report.outstanding , name='outstanding_report'),
     path('pending_sheet/', report.pending_sheet , name='pending_sheet'),
+    path('stock_statement/', report.stock_statement , name='stock_statement'),
 
     path('upload_purchase/', load.upload_purchase_invoice , name='upload_purchase'),
     path('get_last_load/', load.get_last_load , name='get_last_load'),

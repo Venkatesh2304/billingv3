@@ -245,7 +245,10 @@ class Session(requests.Session, ABC):
                 self.logger.info(
                     "User has been added to the project.toml and fetched from input"
                 )
+        
+        self.fetch_config()
 
+    def fetch_config(self) : 
         self.db = UserDB(user_db, self.user, self.key)
         self.user_config = self.db.get_user()
         self.config = self.user_config[self.key]
@@ -253,6 +256,7 @@ class Session(requests.Session, ABC):
             self.config = self.db.get_second_level_config()
         self.previous_cookies = self.db.get_cookies()
         if self.load_cookies and self.previous_cookies : 
+            self.cookies.clear()
             for name,value,domain,path in self.previous_cookies : 
                 self.cookies.set(name,value,domain=domain,path=path)
 

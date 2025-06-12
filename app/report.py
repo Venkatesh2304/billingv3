@@ -13,7 +13,7 @@ import pandas as pd
 from app import models, pdf_create
 from app.common import bulk_raw_insert, query_db
 from app.sync import sync_reports
-from custom.classes import Billing
+from custom.classes import Billing, IkeaDownloader
 from rest_framework.decorators import api_view
 from billingv3.settings import FILES_DIR 
 
@@ -191,6 +191,31 @@ def outstanding(request) :
     output.seek(0)
     with open(f"{FILES_DIR}/outstanding.xlsx","wb+") as f : f.write(output.getvalue())
     return JsonResponse({"status":"success"})
+
+
+@api_view(["POST"])
+def stock_statement(request) : 
+
+    i1 = IkeaDownloader()
+    i1.load
+    i1.change_user("lakme_rural")
+    df1 = i1.current_stock(datetime.date.today())
+
+    i2 = IkeaDownloader()
+    i2.change_user("lakme_urban")
+    df2 = i2.current_stock(datetime.date.today())
+
+    details = pd.concat([df1,df2],axis=0).drop_duplicates(subset=["SKU7"])[["SKU7","Product Name","Pur.Rate"]]
+    df1 = df1.groupby("SKU7")[["Units"]].sum().reset_index()
+    df2 = df2.groupby("SKU7")[["Units"]].sum().reset_index()
+    df = df1.merge(df2, on="SKU7", how="outer", suffixes=(" Rural"," Urban")).fillna(0)
+    df["Total Qty"] = df["Units Rural"] + df["Units Urban"]
+    df = df.merge(details, on="SKU7", how="left")
+    df = df[["SKU7","Product Name","Pur.Rate","Units Rural","Units Urban","Total Qty"]]
+    #send the df as excel in django 
+    df.to_excel(f"{FILES_DIR}/stock_statement.xlsx", index=False, sheet_name='Current Stock')
+    return JsonResponse({"status":"success"})
+
 
 @api_view(["POST"])
 def pending_sheet(request) :
