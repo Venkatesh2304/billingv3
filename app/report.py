@@ -197,7 +197,6 @@ def outstanding(request) :
 def stock_statement(request) : 
 
     i1 = IkeaDownloader()
-    i1.load
     i1.change_user("lakme_rural")
     df1 = i1.current_stock(datetime.date.today())
 
