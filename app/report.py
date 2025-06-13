@@ -204,12 +204,12 @@ def stock_statement(request) :
     i2.change_user("lakme_urban")
     df2 = i2.current_stock_with_mrp(datetime.date.today())
 
-    details = pd.concat([df1,df2],axis=0).drop_duplicates(subset=["SKU7"])[["SKU7","Product Name","MRP"]]
-    df1 = df1.groupby("SKU7")[["Units"]].sum().reset_index()
-    df2 = df2.groupby("SKU7")[["Units"]].sum().reset_index()
-    df = df1.merge(df2, on="SKU7", how="outer", suffixes=(" Rural"," Urban")).fillna(0)
+    details = pd.concat([df1,df2],axis=0).drop_duplicates(subset=["SKU7","MRP"])[["SKU7","Product Name","MRP"]]
+    df1 = df1.groupby(["SKU7","MRP"])[["Units"]].sum().reset_index()
+    df2 = df2.groupby(["SKU7","MRP"])[["Units"]].sum().reset_index()
+    df = df1.merge(df2, on=["SKU7","MRP"], how="outer", suffixes=(" Rural"," Urban")).fillna(0)
     df["Total Qty"] = df["Units Rural"] + df["Units Urban"]
-    df = df.merge(details, on="SKU7", how="left")
+    df = df.merge(details, on=["SKU7","MRP"], how="left")
     df = df[["SKU7","Product Name","MRP","Units Rural","Units Urban","Total Qty"]]
     #send the df as excel in django 
     df.to_excel(f"{FILES_DIR}/stock_statement.xlsx", index=False, sheet_name='Current Stock')
