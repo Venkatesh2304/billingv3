@@ -113,7 +113,7 @@ def get_product(request) :
     products = models.PurchaseProduct.objects.filter(inum__load=load,cbu=cbu)
     mrp = models.PurchaseProduct.objects.filter(cbu = cbu).first().mrp
     purchase_qty = products.aggregate(total_qty=models.Sum("qty"))["total_qty"] or 0 
-    already_scanned_qty = models    .TruckProduct.objects.filter(load=load,cbu=cbu).aggregate(total_qty=models.Sum("qty"))["total_qty"] or 0 
+    already_scanned_qty = models.TruckProduct.objects.filter(load=load,cbu=cbu).aggregate(total_qty=models.Sum("qty"))["total_qty"] or 0 
     return JsonResponse({
         "cbu": cbu ,
         "mrp": mrp ,

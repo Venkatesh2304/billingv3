@@ -198,19 +198,19 @@ def stock_statement(request) :
 
     i1 = IkeaDownloader()
     i1.change_user("lakme_rural")
-    df1 = i1.current_stock(datetime.date.today())
+    df1 = i1.current_stock_with_mrp(datetime.date.today())
 
     i2 = IkeaDownloader()
     i2.change_user("lakme_urban")
-    df2 = i2.current_stock(datetime.date.today())
+    df2 = i2.current_stock_with_mrp(datetime.date.today())
 
-    details = pd.concat([df1,df2],axis=0).drop_duplicates(subset=["SKU7"])[["SKU7","Product Name","Pur.Rate"]]
+    details = pd.concat([df1,df2],axis=0).drop_duplicates(subset=["SKU7"])[["SKU7","Product Name","MRP"]]
     df1 = df1.groupby("SKU7")[["Units"]].sum().reset_index()
     df2 = df2.groupby("SKU7")[["Units"]].sum().reset_index()
     df = df1.merge(df2, on="SKU7", how="outer", suffixes=(" Rural"," Urban")).fillna(0)
     df["Total Qty"] = df["Units Rural"] + df["Units Urban"]
     df = df.merge(details, on="SKU7", how="left")
-    df = df[["SKU7","Product Name","Pur.Rate","Units Rural","Units Urban","Total Qty"]]
+    df = df[["SKU7","Product Name","MRP","Units Rural","Units Urban","Total Qty"]]
     #send the df as excel in django 
     df.to_excel(f"{FILES_DIR}/stock_statement.xlsx", index=False, sheet_name='Current Stock')
     return JsonResponse({"status":"success"})

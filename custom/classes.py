@@ -197,6 +197,9 @@ class IkeaDownloader(BaseIkea) :
       def current_stock(self ,date) :
           return self.report("ikea/current_stock",r'(":val16":").{10}', (date.strftime("%Y-%m-%d"),))
       
+      def current_stock_with_mrp(self ,date) :
+          return self.report("ikea/current_stock_mrp",r'(":val16":").{10}', (date.strftime("%Y-%m-%d"),))
+      
       def sales_reg(self,fromd,tod) : 
           df = self.report("ikea/sales_reg",r'(":val1":").{10}(",":val2":").{10}' ,
                                                        (fromd.strftime("%d/%m/%Y"),tod.strftime("%d/%m/%Y")) )
