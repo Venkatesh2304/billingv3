@@ -111,7 +111,7 @@ def get_product(request) :
     # cbu = barcode.split("(241)")[1].split("(10)")[0].strip().upper()
     load = models.TruckLoad.objects.filter(completed = False).last()
     products = models.PurchaseProduct.objects.filter(inum__load=load,cbu=cbu)
-    mrp = models.PurchaseProduct.objects.filter(cbu = cbu).first().mrp
+    mrp = models.PurchaseProduct.objects.filter(cbu = cbu).last().mrp
     purchase_qty = products.aggregate(total_qty=models.Sum("qty"))["total_qty"] or 0 
     already_scanned_qty = models.TruckProduct.objects.filter(load=load,cbu=cbu).aggregate(total_qty=models.Sum("qty"))["total_qty"] or 0 
     return JsonResponse({

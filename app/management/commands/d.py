@@ -14,15 +14,22 @@ def sync_beat_parties_ikea(force = True) :
 
 
 i = IkeaDownloader()
+data = i.get(f"/rsunify/app/billing/retrievebill?billRef=CA00182").json()
+salId = data["billHdVO"]["blhDsrId"]
+i.get(f"/rsunify/app/billing/deletemutable?salesmanId={salId}")
+df = pd.DataFrame(data["billingProductMasterVOList"])
+df.to_excel("b.xlsx", index=False)
+prodCode
+prodName
+mrp
+qCase
+qUnits
+unitsCase
 
-print(i.get(f"/rsunify/app/billing/retrievebill?billRef=CA00182").text)
-data = {
-    'strJsonParams': '{"screenName":"Manual Billing"}',
-}
-response = i.post(
-    '/rsunify/app/ikeaCommonUtilController/removeScreenNameFromSession',
-    data=data,
-)
+
+print(df)
+
+
 sdf
 
 
