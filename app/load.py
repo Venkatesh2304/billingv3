@@ -178,7 +178,7 @@ def load_summary(request) :
     products = models.PurchaseProduct.objects.filter(inum_id__in=inums).values_list("cbu","sku","qty","mrp")
     purchase_products = pd.DataFrame(products,columns=["cbu","sku","purchase_qty","mrp"])
     purchase_products1 = purchase_products.copy()
-    purchase_products = purchase_products.groupby(["cbu","sku"]).sum().reset_index()
+    purchase_products = purchase_products.groupby(["cbu","sku"]).aggregate({"purchase_qty" : "sum","mrp" : "first"}).reset_index()
     load_cbu = list(models.TruckProduct.objects.filter(load=load).values("cbu","qty"))
     load_products = pd.DataFrame(load_cbu,columns=["cbu","qty"]).rename(columns={"qty":"load_qty"})
     load_products = load_products.groupby("cbu").sum().reset_index()
