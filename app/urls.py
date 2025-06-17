@@ -1,6 +1,6 @@
 from app.billing import billing_view
 from app.print import print_bills
-from app import bank, report ,load
+from app import bank, report ,load , bill_check 
 from . import views
 from django.urls import path
 from django.views.decorators.cache import cache_page
@@ -58,6 +58,8 @@ urlpatterns = [
     path('scan_product/', load.scan_product , name='scan_product'),
     path('barcode_to_cbu/', load.barcode_to_cbu , name='barcode_to_cbu'),
     path('map_barcode_to_cbu/', load.map_barcode_to_cbu , name='map_barcode_to_cbu'),
+
+    path('get_bill_products/', bill_check.get_bill_products , name='get_bill_products'),
 
 
 

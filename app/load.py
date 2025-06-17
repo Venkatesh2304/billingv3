@@ -96,14 +96,12 @@ def barcode_to_cbu(request) :
     obj = models.Barcode.objects.get(barcode=barcode)
     return JsonResponse({"cbu" : obj.cbu if obj else None })
 
-
 @api_view(["POST"])
 def map_barcode_to_cbu(request) : 
     barcode = request.data.get("barcode").upper().strip()
     cbu = request.data.get("cbu").strip().upper()
     models.Barcode.objects.create(barcode=barcode,cbu=cbu).save()
     return JsonResponse({"status": "success", "message": "Barcode mapped to CBU successfully"})
-
 
 @api_view(["POST"])
 def get_product(request) : 
@@ -184,7 +182,7 @@ def load_summary(request) :
     load_products = load_products.groupby("cbu").sum().reset_index()
     #load_products = pd.DataFrame(Counter(load_cbu).items(),columns=["cbu","load_qty"])
     df = pd.merge(purchase_products, load_products, on="cbu", how="outer").fillna(0)
-    df["diff"] = df["purchase_qty"] - df["load_qty"]
+    df["diff"] = df["load_qty"] - df["purchase_qty"]
     df = pd.merge(df, product_master[["sku","desc"]].drop_duplicates(subset=["sku"]) , on="sku", how="left") 
     df = df[["cbu","desc","mrp","purchase_qty","load_qty","diff"]]
     bytesio = BytesIO()

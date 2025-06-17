@@ -505,9 +505,9 @@ class TruckProduct(models.Model) :
      load = models.ForeignKey("app.TruckLoad", on_delete=models.DO_NOTHING, related_name="truck_products")
      
 class Barcode(models.Model) : 
-     barcode = models.CharField(max_length=300,primary_key=True)
-     cbu = models.CharField(max_length=20)
-     
+     sku = models.CharField(max_length=20,primary_key=True)
+     barcode = models.CharField(max_length=300)
+
 # class SalesmanCollectionBill(models.Model) : 
 #     chq = ForeignKey("app.SalesmanCollection",on_delete=models.CASCADE,related_name="bills")
 #     inum = ForeignKey("app.Sales",db_index=False,db_constraint=False,on_delete=models.DO_NOTHING)

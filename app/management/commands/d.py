@@ -14,19 +14,21 @@ def sync_beat_parties_ikea(force = True) :
 
 
 i = IkeaDownloader()
-data = i.get(f"/rsunify/app/billing/retrievebill?billRef=CA00182").json()
+print(i.download_settle_cheque(type = "SETTLED"))
+sdf
+
+data = i.get(f"/rsunify/app/billing/retrievebill?billRef=CA00150").json()
 salId = data["billHdVO"]["blhDsrId"]
 i.get(f"/rsunify/app/billing/deletemutable?salesmanId={salId}")
 df = pd.DataFrame(data["billingProductMasterVOList"])
-df.to_excel("b.xlsx", index=False)
-prodCode
-prodName
-mrp
-qCase
-qUnits
-unitsCase
-
-
+df = df.rename(columns={
+    "prodCode": "sku",
+    "prodName" : "desc",
+    "mrp": "mrp",
+    "qCase": "cases",
+    "qUnits": "units",
+    "prodUpc": "upc"
+})[["sku", "desc", "mrp", "cases", "units", "upc"]]
 print(df)
 
 

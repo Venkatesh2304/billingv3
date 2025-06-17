@@ -441,7 +441,7 @@ headers = {
 
 data = {
     'jsonObjfileInfi': '[{"title":"Cheque Download,CHEQUE,STATUS,VALIDATION","reportfilename":"Cheque Download","viewpage":"cheque","viewname":"CHEQUE_BULK_DWN_XL","querycount":3}]',
-    'jsonObjWhereClause': '{":val1":"PENDING",":val2":"30/03/2024",":val3":"26/09/2024",":val4":"01/04/2023",":val5":"26/09/2024",":val6":-1,":val7":"",":val8":"",":val9":"ALL"}',
+    'jsonObjWhereClause': '{":val1":"PENDING",":val2":"30/03/2024",":val3":"26/09/2024",":val4":"01/04/2025",":val5":"26/09/2025",":val6":-1,":val7":"",":val8":"",":val9":"ALL"}',
 }
 
 ikea_download_settle_cheque = CurlRequest('POST',
