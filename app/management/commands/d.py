@@ -14,7 +14,10 @@ def sync_beat_parties_ikea(force = True) :
 
 
 i = IkeaDownloader()
-print(i.download_settle_cheque(type = "SETTLED"))
+c = i.collection(datetime.date(2025, 6, 15),datetime.date(2025, 6, 17))
+print(c.iloc[0])
+
+# print(i.download_settle_cheque(type = "SETTLED"))
 sdf
 
 data = i.get(f"/rsunify/app/billing/retrievebill?billRef=CA00150").json()

@@ -349,7 +349,7 @@ data = {
     'jsonData': '[]',
     'jsonObjforheaders': '[{"1":"RS Name:","2":"Coll From Date:","3":"Division:","4":"Coll To Date:","5":"Beat:","6":"Bill From Date:","7":"Party:","8":"Bill To Date:","9":"Salesperson:","10":"Bill Nos:","11":"Vehicle:","12":"Collection Code:","val1":"DEVAKI ENTERPRISES","val2":"01/04/2024","val3":"List of Divisions","val4":"12/11/2024","val5":"List of Beats","val6":"01/04/2023","val7":"List of Outlet","val8":"12/11/2024","val9":"List of Salespersons","val10":"List of Bill Numbers","val11":"List of Vehicles","val12":"List of Collection Codes"}]',
     'jsonObjfileInfi': '[{"title":"Collection Summary - General,Collection Summary","reportfilename":"Collection Summary","viewpage":"report/collectionSummary","viewname":"COLLECTION_SUMMARY_REPORT","querycount":1}]',
-    'jsonObjWhereClause': '{":val1":"",":val2":"",":val3":"",":val4":"",":val5":"",":val6":"",":val7":"",":val8":"",":val9":"",":val10":"2024/04/01",":val11":"2024/11/12",":val12":"2023/04/01",":val13":"2024/11/12",":val14":"",":val15":"All",":val16":"Bill Date,Bill Number,Party Name",":val17":"Ascending",":val18":"General",":val19":"Excel",":val20":16,":val21":""}',
+    'jsonObjWhereClause': '{":val1":"",":val2":"",":val3":"",":val4":"",":val5":"",":val6":"",":val7":"",":val8":"",":val9":"",":val10":"2024/04/01",":val11":"2024/11/12",":val12":"2023/04/01",":val13":"2024/11/12",":val14":"",":val15":"All",":val16":"Bill Date,Bill Number,Party Name",":val17":"Ascending",":val18":"General",":val19":"Excel",":val20":1,":val21":""}',
 }
 
 ikea_collection = CurlRequest('POST',
