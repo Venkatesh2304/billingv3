@@ -14,6 +14,18 @@ def sync_beat_parties_ikea(force = True) :
 
 
 i = IkeaDownloader()
+df = i.download_settle_cheque()
+print("CHEQUE NO" in df.columns)
+      
+# "CHEQUE NO"
+salId
+p = i.product_wise_purchase(datetime.date(2025, 4, 1),datetime.date(2025, 6, 19))
+p.to_excel("product_wise_purchase.xlsx",index=False)
+g = i.gstr_report(datetime.date(2025, 4, 1),datetime.date(2025, 6, 19))
+g.to_excel("gstr_report.xlsx",index=False)
+sdf
+
+
 c = i.collection(datetime.date(2025, 6, 15),datetime.date(2025, 6, 17))
 print(c.iloc[0])
 
