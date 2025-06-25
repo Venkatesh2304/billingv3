@@ -15,7 +15,9 @@ def sync_beat_parties_ikea(force = True) :
 
 i = IkeaDownloader()
 df = i.download_settle_cheque()
+i.upload_settle_cheque
 print("CHEQUE NO" in df.columns)
+print(df)
       
 # "CHEQUE NO"
 salId

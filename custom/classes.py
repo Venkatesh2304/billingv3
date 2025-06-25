@@ -178,10 +178,11 @@ class IkeaDownloader(BaseIkea) :
            }
           return self.post("/rsunify/app/collection/collectionUpload",files = files,data = {}).json()
 
-      def download_settle_cheque(self,type="PENDING",fromd = datetime.date.today(),tod = datetime.date.today())  : 
-          print(fromd,tod)
+      def download_settle_cheque(self,type="PENDING",fromd = None,tod = None)  :
+          today = datetime.date.today()  
           return self.report("ikea/download_settle_cheque",r'(":val1":").*(",":val2":").{10}(",":val3":").{10}(.{32}).{10}', 
-                             (type,fromd.strftime("%d/%m/%Y"),tod.strftime("%d/%m/%Y"),datetime.date.today().strftime("%d/%m/%Y")) ) 
+                             (type,(fromd or today).strftime("%d/%m/%Y"),
+                                        (tod or today).strftime("%d/%m/%Y"), today.strftime("%d/%m/%Y")) ) 
          
       def upload_settle_cheque(self,file : BytesIO) -> dict :
           files = {
