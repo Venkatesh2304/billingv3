@@ -41,6 +41,7 @@ urlpatterns = [
     path('push_collection/', bank.push_collection, name='push_collection'),
     path('unpush_collection/<str:bank_id>/', bank.unpush_collection, name='unpush_collection'),
     path('match_upi/', bank.auto_match_upi, name='match_upi'),
+    path('refresh_bank/', bank.refresh_bank, name='refresh_bank'),
 
 
     path('basepack/', report.basepack , name='basepack'),
