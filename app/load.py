@@ -184,7 +184,7 @@ def load_summary(request) :
     df = pd.merge(purchase_products, load_products, on="cbu", how="outer").fillna(0)
     df["diff"] = df["load_qty"] - df["purchase_qty"]
     df = pd.merge(df, product_master[["sku","desc"]].drop_duplicates(subset=["sku"]) , on="sku", how="left") 
-    df = df[["cbu","desc","mrp","purchase_qty","load_qty","diff"]]
+    df = df[["cbu","sku","desc","mrp","purchase_qty","load_qty","diff"]]
     bytesio = BytesIO()
     with pd.ExcelWriter(bytesio, engine='xlsxwriter') as writer:
         df.to_excel(writer, index=False, sheet_name='Summary')
