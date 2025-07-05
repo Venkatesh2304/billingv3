@@ -199,10 +199,12 @@ def stock_statement(request) :
     i1 = IkeaDownloader()
     i1.change_user("lakme_rural")
     df1 = i1.current_stock_with_mrp(datetime.date.today())
+    df1 = df1[df1["Location"] == "MAIN GODOWN"]
 
     i2 = IkeaDownloader()
     i2.change_user("lakme_urban")
     df2 = i2.current_stock_with_mrp(datetime.date.today())
+    df2 = df2[df2["Location"] == "MAIN GODOWN"]
 
     details = pd.concat([df1,df2],axis=0).drop_duplicates(subset=["SKU7","MRP"])[["SKU7","Product Name","MRP"]]
     df1 = df1.groupby(["SKU7","MRP"])[["Units"]].sum().reset_index()
