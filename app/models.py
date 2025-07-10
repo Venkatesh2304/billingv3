@@ -503,6 +503,9 @@ class TruckProduct(models.Model) :
      cbu = models.CharField(max_length=20)
      qty = models.IntegerField()
      load = models.ForeignKey("app.TruckLoad", on_delete=models.DO_NOTHING, related_name="truck_products")
+     box = models.IntegerField(default=1,db_default=1)  
+     mrp = models.IntegerField()
+
      
 class Barcode(models.Model) : 
      sku = models.CharField(max_length=20,primary_key=True)

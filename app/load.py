@@ -106,26 +106,46 @@ def map_barcode_to_cbu(request) :
 @api_view(["POST"])
 def get_product(request) : 
     cbu = request.data.get("cbu").strip().upper()
+    mrp = request.data.get("mrp")
+    # barcode = request.data.get("barcode").upper().strip()
     # cbu = barcode.split("(241)")[1].split("(10)")[0].strip().upper()
     load = models.TruckLoad.objects.filter(completed = False).last()
-    products = models.PurchaseProduct.objects.filter(inum__load=load,cbu=cbu)
-    mrp = models.PurchaseProduct.objects.filter(cbu = cbu).last().mrp
-    purchase_qty = products.aggregate(total_qty=models.Sum("qty"))["total_qty"] or 0 
-    already_scanned_qty = models.TruckProduct.objects.filter(load=load,cbu=cbu).aggregate(total_qty=models.Sum("qty"))["total_qty"] or 0 
+    mrps = models.PurchaseProduct.objects.filter(inum__load=load,cbu=cbu)
+    mrps = [ mrp.mrp for mrp in mrps ]
+    products = models.PurchaseProduct.objects.filter(inum__load=load,cbu=cbu,mrp=mrp)
+    if products.exists() :
+        purchase_qty = products.aggregate(total_qty=models.Sum("qty"))["total_qty"] or 0 
+    else : 
+        purchase_qty = 0
+    already_scanned_qty = models.TruckProduct.objects.filter(load=load,cbu=cbu).aggregate(total_qty=models.Sum("qty"))["total_qty"] or 0     
     return JsonResponse({
         "cbu": cbu ,
         "mrp": mrp ,
-        "rem_qty": purchase_qty - already_scanned_qty
+        "invoice_mrps" : mrps,
+        "rem_qty": purchase_qty - already_scanned_qty , 
+        "warning" : "mrp_mismatch" if len(mrps) and (mrp not in mrps) else None 
     })
+
+
+
+@api_view(["GET"])
+def get_box_no(request) : 
+    load = models.TruckLoad.objects.filter(completed=False).last()
+    last_product = models.TruckProduct.objects.filter(load=load).last()
+    box_no = (last_product.box + 1) if last_product else 1
+    return JsonResponse({"box_no": box_no})
+
 
 @api_view(["POST"])
 def scan_product(request) : 
     products = request.data.get("products")
     load = models.TruckLoad.objects.filter(completed=False).last()
+    last_product = models.TruckProduct.objects.filter(load=load).last()
+    box_no = (last_product.box + 1) if last_product else 1
     for product in products : 
         models.TruckProduct.objects.create(
-            load=load,cbu=product["cbu"],qty=product["qty"]).save()
-    return JsonResponse({"status": "success", "message": "Products scanned successfully"})
+            load=load,cbu=product["cbu"],qty=product["qty"],box = box_no,mrp=product["mrp"]).save()
+    return JsonResponse({"status": "success", "message": "Products scanned successfully","box_no" : box_no})
     # barcode = request.data.get("code").upper().strip().strip("\n")
     # scanned = request.data.get("scanned")
     # qty = request.data.get("qty",1)
