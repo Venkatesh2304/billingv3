@@ -8,9 +8,15 @@ from django.db import connection
 import pandas as pd
 from app.models import *
 import warnings
+
+from custom.classes import IkeaDownloader
 warnings.filterwarnings("ignore")
 pd.options.display.float_format = '{:.2f}'.format
 
+tod = datetime.date.today()
+fromd = tod - datetime.timedelta(days=15)
+IkeaDownloader().product_wise_purchase(fromd,tod).to_excel("a.xlsx")
+exit(0)
 
 # def a() : 
 #     df1 = pd.read_excel("df1.xlsx")

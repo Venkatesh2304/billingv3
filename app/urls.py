@@ -62,6 +62,7 @@ urlpatterns = [
     path('get_box_no/', load.get_box_no , name='get_box_no'),
 
     path('get_bill_products/', bill_check.get_bill_products , name='get_bill_products'),
+    path('get_product_from_barcode/', bill_check.get_product_from_barcode , name='get_product_from_barcode'),
 
 
 

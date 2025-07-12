@@ -350,6 +350,9 @@ class IkeaDownloader(BaseIkea) :
       def upi_statement(self,fromd,tod) :  
           return self.report("ikea/upi_statement",r'(":val3":"\').{10}(\'",":val4":"\').{10}' ,
                                                        (fromd.strftime("%Y-%m-%d"),tod.strftime("%Y-%m-%d")) )
+      
+      def retrivebill(self,bill_no) : 
+          return self.get(f"/rsunify/app/billing/retrievebill?billRef={bill_no}").json()
 
 class Billing(IkeaDownloader) :
 
