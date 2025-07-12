@@ -25,6 +25,7 @@ def get_bill_products(request) :
         "totalQtyUnits" : "total_qty",
         "itemVarCode" : "itemvarient"
     })[["sku", "cbu","name", "mrp", "cases", "units", "upc" , "total_qty" , "itemvarient"]]
+    df = df.groupby(["sku", "cbu", "name", "mrp", "cases", "units", "upc", "itemvarient"]).sum().reset_index()
     # df["desc"] = df["desc"].str.strip()
     # barcodes = models.Barcode.objects.filter(sku__in=df["sku"].values)
     # barcodes = {b.sku: b.barcode for b in barcodes}
