@@ -199,7 +199,7 @@ def load_summary(request) :
     purchase_products = purchase_products.groupby(["cbu","sku","mrp"]).aggregate({"purchase_qty" : "sum"}).reset_index()
     load_cbu = list(models.TruckProduct.objects.filter(load=load).values("cbu","mrp","qty","box"))
     load_products = pd.DataFrame(load_cbu,columns=["cbu","mrp","qty","box"]).rename(columns={"qty":"load_qty"})
-    box_summary = load_products.groupby(["box"])[["qty"]].sum().reset_index()
+    box_summary = load_products.groupby(["box"])[["load_qty"]].sum().reset_index()
     load_products_grouped = load_products.groupby(["cbu","mrp"]).sum().reset_index()
     #load_products = pd.DataFrame(Counter(load_cbu).items(),columns=["cbu","load_qty"])
     df = pd.merge(purchase_products, load_products_grouped, on=["cbu","mrp"], how="outer").fillna(0)
@@ -212,7 +212,7 @@ def load_summary(request) :
         df[df["diff"] != 0].to_excel(writer, index=False, sheet_name='Mismatch')
         df[df["diff"] == 0].to_excel(writer, index=False, sheet_name='Correct')
         box_summary.to_excel(writer, index=False, sheet_name='Box')
-        load_products.to_excel(writer, index=False, sheet_name='Load')
+        load_products.to_excel(writer, index=False, sheet_name='Detailed')
         
     bytesio.seek(0)
     return FileResponse(
