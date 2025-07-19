@@ -197,11 +197,12 @@ def load_summary(request) :
     purchase_products = pd.DataFrame(products,columns=["cbu","sku","purchase_qty","mrp"])
     purchase_products1 = purchase_products.copy()
     purchase_products = purchase_products.groupby(["cbu","sku","mrp"]).aggregate({"purchase_qty" : "sum"}).reset_index()
-    load_cbu = list(models.TruckProduct.objects.filter(load=load).values("cbu","mrp","qty"))
-    load_products = pd.DataFrame(load_cbu,columns=["cbu","mrp","qty"]).rename(columns={"qty":"load_qty"})
-    load_products = load_products.groupby(["cbu","mrp"]).sum().reset_index()
+    load_cbu = list(models.TruckProduct.objects.filter(load=load).values("cbu","mrp","qty","box"))
+    load_products = pd.DataFrame(load_cbu,columns=["cbu","mrp","qty","box"]).rename(columns={"qty":"load_qty"})
+    box_summary = load_products.groupby(["box"])[["qty"]].sum().reset_index()
+    load_products_grouped = load_products.groupby(["cbu","mrp"]).sum().reset_index()
     #load_products = pd.DataFrame(Counter(load_cbu).items(),columns=["cbu","load_qty"])
-    df = pd.merge(purchase_products, load_products, on=["cbu","mrp"], how="outer").fillna(0)
+    df = pd.merge(purchase_products, load_products_grouped, on=["cbu","mrp"], how="outer").fillna(0)
     df["diff"] = df["load_qty"] - df["purchase_qty"]
     df = pd.merge(df, product_master[["sku","desc"]].drop_duplicates(subset=["sku"]) , on="sku", how="left") 
     df = df[["cbu","sku","desc","mrp","purchase_qty","load_qty","diff"]]
@@ -210,6 +211,8 @@ def load_summary(request) :
         df.to_excel(writer, index=False, sheet_name='Summary')
         df[df["diff"] != 0].to_excel(writer, index=False, sheet_name='Mismatch')
         df[df["diff"] == 0].to_excel(writer, index=False, sheet_name='Correct')
+        box_summary.to_excel(writer, index=False, sheet_name='Box')
+        load_products.to_excel(writer, index=False, sheet_name='Load')
         
     bytesio.seek(0)
     return FileResponse(
