@@ -274,7 +274,7 @@ def auto_match_neft(request) :
     ).values_list("inum","balance"))
     #Try all combination of outstandings whre each row has keys inum and balance.
     #allow if the difference is lesss than allowed_difference with amt
-    if len(outstandings) > 10 :
+    if len(outstandings) > 20 :
         return JsonResponse({ "status" : "error", "message" : "Too many outstandings to match." })
     match_count = 0
     matched_invoices = []
