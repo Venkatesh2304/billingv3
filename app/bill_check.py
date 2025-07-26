@@ -36,13 +36,19 @@ def get_bill_products(request) :
     df = df.sort_values(by=["mrp","sku"])
     return JsonResponse(df.to_dict(orient="records"),safe=False)
 
+mapper = {}
+
 @api_view(["POST"])
 def get_product_from_barcode(request) : 
     barcode = request.data.get("barcode")
+    if barcode in mapper : 
+        return JsonResponse(mapper[barcode])
+    
     if len(barcode) > 16 : 
         cbu = barcode.split("(241)")[1].split("(10)")[0].strip().upper()
         type = "cbu"
-        value = models.PurchaseProduct.objects.filter(cbu=cbu).first().sku
+        product = models.PurchaseProduct.objects.filter(cbu=cbu).first()
+        value = product.sku if product else None
     else : 
         import requests
         
@@ -104,6 +110,6 @@ def get_product_from_barcode(request) :
                 varients = [ j["itemvarient"] for i in s["productgroup"] for j in i["products"] ]
                 value = varients[0]
                 break
-
+    mapper[barcode] = { "type" : type , "value" : value  }
     return JsonResponse({ "type" : type , "value" : value  })
     
