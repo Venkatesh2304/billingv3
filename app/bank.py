@@ -282,7 +282,7 @@ def auto_match_neft(request) :
         for combo in combinations(outstandings, r):
             total_balance = sum(-item[1] for item in combo)
             if abs(total_balance - amt) <= allowed_diff:
-                matched_invoices = [{"inum": item[0], "balance": item[1]} for item in combo]
+                matched_invoices = [{"inum": item[0], "balance": -item[1]} for item in combo]
                 if match_count == 0 : match_count = 1 
                 else : 
                     return JsonResponse({"status" : "error", "message" : "Multiple matches found."})
@@ -290,7 +290,8 @@ def auto_match_neft(request) :
         return JsonResponse({"status" : "error", "message" : "No matching invoices found."})
     else : 
         return JsonResponse({"status": "success", "matched_outstanding": 
-                             [inv | {"party" : party_name , "amt" : inv["balance"] } for inv in matched_invoices] 
+                             [ {"bill" : inv["inum"] ,  "party" : party_name , "balance" : inv["balance"] , 
+                                "amt" : inv["balance"] } for inv in matched_invoices] 
                 })
     
 
