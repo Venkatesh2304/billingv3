@@ -108,3 +108,15 @@ class BeatViewSet(viewsets.ModelViewSet):
     queryset = Beat.objects.all()
     serializer_class = BeatSerializer
     filterset_fields = {"days" : ["icontains"]}
+
+
+class TruckProductViewSet(viewsets.ModelViewSet):
+    queryset = TruckProduct.objects.all()
+    serializer_class = TruckProductSerializer
+    pagination_class = Pagination
+    ordering = ["-id"]
+    filterset_fields = ["box","cbu"]
+    def get_queryset(self):
+        load = models.TruckLoad.objects.filter(completed = False).last()
+        qs =  super().get_queryset()
+        return qs.filter(load = load) if load else qs.none()

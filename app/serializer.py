@@ -165,7 +165,7 @@ class OutstandingSerializer(serializers.ModelSerializer):
         fields = ["balance", "bill" , "days","party"]
     
     def get_balance(self, obj):
-        return abs(-obj.balance)
+        return round(abs(-obj.balance))
     
     def get_days(self,obj) : 
         return (datetime.date.today() - obj.date).days
@@ -196,6 +196,12 @@ class BeatSerializer(serializers.ModelSerializer) :
         model = Beat
         fields = ["id", "name", "salesman_name","days","plg"]
  
+
+class TruckProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TruckProduct
+        fields = ["id","box", "cbu", "qty","load"]
+
 
 # class LoadSerializer(WritableNestedModelSerializer):
 #     class TruckPurchaseSerializer(serializers.Serializer):

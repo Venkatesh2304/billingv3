@@ -33,6 +33,7 @@ from functools import wraps
 from django.http import JsonResponse, HttpResponseNotModified
 import app.enums as enums
 from billingv3.settings import FILES_DIR 
+from itertools import combinations
 
 @api_view(["GET"]) 
 def cheque_match(request,bank_id) : 
@@ -255,6 +256,48 @@ def auto_match_upi(request) :
         upi_before_period[upi_before_period["FOUND"] == "Yes"].to_excel(writer,sheet_name=f"Matched UPI (Before)",index=False)
     
     return response
+
+
+@api_view(["POST"])
+def auto_match_neft(request) : 
+    bank_id = request.data.get("bank_id")
+    party_id = request.data.get("party_id")
+    party_name = models.Party.objects.get(code = party_id).name
+    bank_obj = models.BankStatement.objects.get(id = bank_id)
+    amt = bank_obj.amt
+    allowed_diff = 2
+    outstandings = list(models.Outstanding.objects.filter(
+        party_id = party_id,
+        balance__lte = -1,
+        balance__gte = -amt - allowed_diff,
+        date__gte = datetime.date.today() - datetime.timedelta(days=60)
+    ).values_list("inum","balance"))
+    #Try all combination of outstandings whre each row has keys inum and balance.
+    #allow if the difference is lesss than allowed_difference with amt
+    if len(outstandings) > 10 :
+        return JsonResponse({ "status" : "error", "message" : "Too many outstandings to match." })
+    match_count = 0
+    matched_invoices = []
+    for r in range(1, len(outstandings) + 1):
+        for combo in combinations(outstandings, r):
+            total_balance = sum(-item[1] for item in combo)
+            if abs(total_balance - amt) <= allowed_diff:
+                matched_invoices = [{"inum": item[0], "balance": item[1]} for item in combo]
+                if match_count == 0 : match_count = 1 
+                else : 
+                    return JsonResponse({"status" : "error", "message" : "Multiple matches found."})
+    if match_count == 0 :
+        return JsonResponse({"status" : "error", "message" : "No matching invoices found."})
+    else : 
+        return JsonResponse({"status": "success", "matched_outstanding": 
+                             [inv | {"party" : party_name , "amt" : inv["balance"] } for inv in matched_invoices] 
+                })
+    
+
+
+
+    
+
 
 #TODO: Referesh collection (warning : not complete yet)
 @api_view(["GET"])
