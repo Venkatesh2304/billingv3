@@ -296,10 +296,6 @@ def auto_match_neft(request) :
     
 
 
-
-    
-
-
 #TODO: Referesh collection (warning : not complete yet)
 @api_view(["GET"])
 def refresh_bank(request) : 

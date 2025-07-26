@@ -45,10 +45,34 @@ def get_product_from_barcode(request) :
         value = models.PurchaseProduct.objects.filter(cbu=cbu).first().sku
     else : 
         import requests
-        cookies = {
+        
+        cookies1 = {
+            'rack.session': 'BAh7CEkiD3Nlc3Npb25faWQGOgZFVG86HVJhY2s6OlNlc3Npb246OlNlc3Npb25JZAY6D0BwdWJsaWNfaWRJIkU4ZGJhMjJmMWQxYzllY2QxYmYyNThiNDFmMWFlYmRiODJkZTkzYzMwNDkyYWZjZjFhNzQ2MzAzM2I5ZjNjYTJjBjsARkkiCWNzcmYGOwBGSSIxQ0crYkhIOUYxZng2akptWFpTZjdSTjlTd3ArSVN1RVNvYll3MmRVaUx5az0GOwBGSSINdHJhY2tpbmcGOwBGewdJIhRIVFRQX1VTRVJfQUdFTlQGOwBUSSItN2U0YmQ3NTE0YTUwODYzMzlkODQ1MDUzMjcyZDAyMzIyNjQ1MTgxZgY7AEZJIhlIVFRQX0FDQ0VQVF9MQU5HVUFHRQY7AFRJIi1kYTM5YTNlZTVlNmI0YjBkMzI1NWJmZWY5NTYwMTg5MGFmZDgwNzA5BjsARg%3D%3D--cc8556856993753b28cef67408064a53b1141d9b',
+        }
+
+        headers1 = {
+        'eventid': '202507261549434943',
+        'role': '4',
+        'gvalue': '1',
+        'rscode': '41B862',
+        'accesstoken': 'eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjp7ImVtcGNvZGUiOiI4MDAxMDI2NjAiLCJzYWxfY29kZSI6IjQxQjg2Ml9TTU4wMDAwMSIsInBhcnR5X2NvZGUiOiJQMTEiLCJiZWF0X3BsZyI6IkhVTDMiLCJiZWF0X2lkIjoiMjEiLCJyc2NvZGUiOiI0MUI4NjIiLCJwYXJjb2RlaHVsIjoiSFVMLTQxMzU3MVA5NjYifSwiZXhwIjoxNTk1MzgyODUxMjR9.7-bFyJGoqM9izWCX-e9W9QxW6XKtSfnQzHKipsajH8Q',
+        'hulid': 'HUL-413571P966',
+        'token': 'eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjoiODAwMTAyNjYwIiwiZXhwaXJlc0luIjoxNTk1MzgzNzE1MDIsInBvc2l0aW9uX2NvZGUiOiI0MUI4NjJfU01OMDAwMDEiLCJkZXZpY2VfaWQiOiI1NDA5YmRlOGFiNmNkN2NjIiwiYXR0X2ZsYWciOjB9.wCwAWqYzqSGHnsnuITiWiyp-uc6C7dbOXalmDvCsfmk',
+        'xversioncode': '184',
+        'isShikhar': '0',
+        'salcode': '41B862_SMN00001',
+        'empcode': '800102660',
+        'versioncode': '84',
+        'barcode': barcode,
+        'User-Agent': 'Dalvik/2.1.0 (Linux; U; Android 15; motorola edge 50 pro Build/V1UMS35H.10-67-7-1)',
+        'Connection': 'Keep-Alive',
+        }
+
+        cookies2 = {
             'rack.session': 'BAh7CEkiD3Nlc3Npb25faWQGOgZFVG86HVJhY2s6OlNlc3Npb246OlNlc3Npb25JZAY6D0BwdWJsaWNfaWRJIkVkZDRmMDQwNGUzNzA2YmI2ZjdiOWU4YjRkMGY4ODYwMTYyYWFkNmJjNTMwNGY4ZjhkZjZkMDAwM2ZhNTIwY2I1BjsARkkiCWNzcmYGOwBGSSIxMG9udG42YmcwV0d3YnBldDRnRDM4SUJLc01LZ0hmUTlqUE8wbGZTMlJUYz0GOwBGSSINdHJhY2tpbmcGOwBGewdJIhRIVFRQX1VTRVJfQUdFTlQGOwBUSSItN2U0YmQ3NTE0YTUwODYzMzlkODQ1MDUzMjcyZDAyMzIyNjQ1MTgxZgY7AEZJIhlIVFRQX0FDQ0VQVF9MQU5HVUFHRQY7AFRJIi1kYTM5YTNlZTVlNmI0YjBkMzI1NWJmZWY5NTYwMTg5MGFmZDgwNzA5BjsARg%3D%3D--d3e3a92943f10a6420199d0413a28c37ebe67ddd',
         }
-        headers = {
+        
+        headers2 = {
             'eventid': '20250712131955955',
             'role': '4',
             'gvalue': '1',
@@ -65,14 +89,21 @@ def get_product_from_barcode(request) :
             'User-Agent': 'Dalvik/2.1.0 (Linux; U; Android 15; motorola edge 50 pro Build/V1UMS35H.10-67-7-1)',
             'Connection': 'Keep-Alive',
         } #8901030978692
-        response = requests.get(
-            'https://salesedgecdn-new.hulcd.com/salesedge/api/v1/products/get_bar_code_new_ui_v8_2',
-            cookies=cookies,
-            headers=headers,
-        )
-        s = response.json()
-        varients = [ j["itemvarient"] for i in s["productgroup"] for j in i["products"] ]
+        
         type = "itemvarient"
-        value = varients[0]
+        value = None 
+
+        for cookies,headers in [(cookies1,headers1),(cookies2,headers2)]:
+            response = requests.get(
+                'https://salesedgecdn-new.hulcd.com/salesedge/api/v1/products/get_bar_code_new_ui_v8_2',
+                cookies=cookies,
+                headers=headers,
+            )
+            s = response.json()
+            if "productgroup" in s : 
+                varients = [ j["itemvarient"] for i in s["productgroup"] for j in i["products"] ]
+                value = varients[0]
+                break
+
     return JsonResponse({ "type" : type , "value" : value  })
     
