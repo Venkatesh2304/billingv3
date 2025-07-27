@@ -334,6 +334,10 @@ class Outstanding(models.Model) :
             # managed =  False
             verbose_name_plural = 'Outstanding'
 
+class BarcodeMap(models.Model) :
+     barcode = models.CharField(max_length=300,primary_key=True)
+     varient = models.CharField(max_length=20,null=True,blank=True)
+     
 
 # class SalesmanPendingSheetX(Beat) :
 #       class Meta:

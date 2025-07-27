@@ -16,7 +16,7 @@ def get_bill_products(request) :
     df = pd.DataFrame(data["billingProductMasterVOList"])
     df = df.rename(columns={
         "prodCode": "sku",
-        "prodCCode" : "cbu" , 
+        "prodCCode" : "sku_small" , 
         "prodName" : "name",
         "mrp": "mrp",
         "qCase": "cases",
@@ -25,7 +25,16 @@ def get_bill_products(request) :
         "totalQtyUnits" : "total_qty",
         "itemVarCode" : "itemvarient"
     })[["sku", "cbu","name", "mrp", "cases", "units", "upc" , "total_qty" , "itemvarient"]]
-    df = df.groupby(["sku", "cbu", "name", "mrp", "upc", "itemvarient"]).sum().reset_index()
+    df = df.groupby(["sku","sku_small","name", "mrp", "upc", "itemvarient"]).sum().reset_index()
+    
+    maps = list(models.BarcodeMap.objects.filter(varient__in=df["itemvarient"].values).values_list("varient", "barcode"))
+    maps = {varient: barcode for varient, barcode in maps}
+    df["barcode"] = df["itemvarient"].apply(lambda x: maps.get(x, None))
+
+    maps = list(models.PurchaseProduct.objects.filter(sku__in=df["sku_small"].values).values_list("sku", "cbu"))
+    maps = {sku: cbu for sku, cbu in maps}
+    df["cbu"] = df["sku_small"].apply(lambda x: maps.get(x, None))
+
     # df["desc"] = df["desc"].str.strip()
     # barcodes = models.Barcode.objects.filter(sku__in=df["sku"].values)
     # barcodes = {b.sku: b.barcode for b in barcodes}

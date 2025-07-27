@@ -8,14 +8,24 @@ from django.db import connection
 import pandas as pd
 from app.models import *
 import warnings
+from app.common import bulk_raw_insert
 
 from custom.classes import IkeaDownloader
 warnings.filterwarnings("ignore")
 pd.options.display.float_format = '{:.2f}'.format
+maps = json.load(open("/home/venkatesh/temp/barcode/a.json","r"))
+for k,v in maps.items() :
+    BarcodeMap.objects.create(
+        barcode = k,
+        varient = v)
+    print(k,v)
+    
 
-tod = datetime.date.today()
-fromd = tod - datetime.timedelta(days=15)
-IkeaDownloader().product_wise_purchase(fromd,tod).to_excel("a.xlsx")
+
+# tod = datetime.date.today()
+# fromd = tod - datetime.timedelta(days=15)
+# IkeaDownloader().product_wise_purchase(fromd,tod).to_excel("a.xlsx")
+
 exit(0)
 
 # def a() : 
