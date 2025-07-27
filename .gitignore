@@ -11,6 +11,7 @@ bill.docx
 db1.sqlite3
 db2.sqlite3
 *.json
+!barcodes.json
 *.html
 bills/
 voice_notes/
