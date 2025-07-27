@@ -24,7 +24,7 @@ def get_bill_products(request) :
         "prodUpc": "upc" ,
         "totalQtyUnits" : "total_qty",
         "itemVarCode" : "itemvarient"
-    })[["sku", "cbu","name", "mrp", "cases", "units", "upc" , "total_qty" , "itemvarient"]]
+    })[["sku", "sku_small","name", "mrp", "cases", "units", "upc" , "total_qty" , "itemvarient"]]
     df = df.groupby(["sku","sku_small","name", "mrp", "upc", "itemvarient"]).sum().reset_index()
     
     maps = list(models.BarcodeMap.objects.filter(varient__in=df["itemvarient"].values).values_list("varient", "barcode"))
