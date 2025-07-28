@@ -1,4 +1,4 @@
-from collections import Counter
+from collections import Counter, defaultdict
 from django.http import JsonResponse
 import pandas as pd
 from rest_framework.decorators import api_view
@@ -28,8 +28,12 @@ def get_bill_products(request) :
     df = df.groupby(["sku","sku_small","name", "mrp", "upc", "itemvarient"]).sum().reset_index()
     
     maps = list(models.BarcodeMap.objects.filter(varient__in=df["itemvarient"].values).values_list("varient", "barcode"))
-    maps = {varient: barcode for varient, barcode in maps}
+    varient_maps = defaultdict(list)
+    for varient, barcode in maps:
+        varient_maps[varient].append(barcode)
+    maps = {varient: ",".join(barcodes) for varient, barcodes in varient_maps.items()}
     df["barcode"] = df["itemvarient"].apply(lambda x: maps.get(x, None))
+    
 
     maps = list(models.PurchaseProduct.objects.filter(sku__in=df["sku_small"].values).values_list("sku", "cbu"))
     maps = {sku: cbu for sku, cbu in maps}
