@@ -1,6 +1,6 @@
 from app.billing import billing_view
 from app.print import print_bills
-from app import bank, report ,load , bill_check 
+from app import bank, report ,load , bill_check , stock_check
 from . import views
 from django.urls import path
 from django.views.decorators.cache import cache_page
@@ -64,6 +64,7 @@ urlpatterns = [
     path('get_box_no/', load.get_box_no , name='get_box_no'),
 
     path('get_bill_products/', bill_check.get_bill_products , name='get_bill_products'),
+    path('get_closing_products/', stock_check.get_closing_products , name='get_closing_products'),
     path('get_product_from_barcode/', bill_check.get_product_from_barcode , name='get_product_from_barcode'),
 
 
