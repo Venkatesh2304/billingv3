@@ -36,7 +36,7 @@ def get_sku_to_cbu_map(skus) :
             conn.close()
     maps = list(set(rows))
     maps = {sku: cbu for sku, cbu in maps}
-    return rows
+    return maps
 
 @api_view(["POST"])
 def get_closing_products(request) : 
