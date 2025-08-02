@@ -12,7 +12,7 @@ tod = datetime.date.today()
 
 i = IkeaDownloader()
 df = i.stock_master()
-basepack_to_sku = dict(zip(df["Basepack Code"].values , df["Product Code"].values))
+basepack_to_sku = dict(zip( df["Basepack Code"].apply(str).values , df["Product Code"].values))
 
 for barcode,basepack in barcode_to_basepack.items() :
     BarcodeMap.objects.create(
