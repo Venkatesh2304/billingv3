@@ -9,6 +9,35 @@ from app import models
 from app.common import bulk_raw_insert, query_db
 from custom.classes import IkeaDownloader
 
+def get_sku_to_cbu_map(skus) : 
+    import psycopg2
+    rows = []
+    for user in ["lakme_urban", "lakme_rural"]:
+        conn = psycopg2.connect(
+            dbname=user,           # replace with your DB name
+            user="postgres",
+            password="Ven2004",
+            host="localhost",
+            port="5432"
+        )
+        try:
+            # Create a cursor
+            cur = conn.cursor()
+            sku_list = tuple(skus)
+            query = """
+                SELECT sku, cbu
+                FROM app_purchaseproduct
+                WHERE sku IN %s
+            """
+            cur.execute(query, (sku_list,))
+            rows += cur.fetchall()
+        finally:
+            cur.close()
+            conn.close()
+    maps = list(set(rows))
+    maps = {sku: cbu for sku, cbu in maps}
+    return rows
+
 @api_view(["POST"])
 def get_closing_products(request) : 
     i1 = IkeaDownloader()
@@ -48,37 +77,8 @@ def get_closing_products(request) :
     df["barcode"] = df["itemvarient"].apply(lambda x: maps.get(x, None))
     
     df["sku_small"] = df["sku"].str.slice(0,5)
-    
-    
-    import psycopg2
-    rows = []
-    for user in ["lakme_urban", "lakme_rural"]:
-        conn = psycopg2.connect(
-            dbname=user,           # replace with your DB name
-            user="postgres",
-            password="Ven2004",
-            host="localhost",
-            port="5432"
-        )
-        try:
-            # Create a cursor
-            cur = conn.cursor()
-            sku_list = tuple(df["sku_small"].values)
-            query = """
-                SELECT sku, cbu
-                FROM app_purchaseproduct
-                WHERE sku IN %s
-            """
-            cur.execute(query, (sku_list,))
-            rows += cur.fetchall()
-        finally:
-            cur.close()
-            conn.close()
-
-
+    maps = get_sku_to_cbu_map(df["sku_small"].values)
     #models.PurchaseProduct.objects.filter(sku__in=df["sku_small"].values).values_list("sku", "cbu")            
-    maps = list(rows)
-    maps = {sku: cbu for sku, cbu in maps}
     df["cbu"] = df["sku_small"].apply(lambda x: maps.get(x, None))
 
     df = df.sort_values(by=["mrp","sku"])

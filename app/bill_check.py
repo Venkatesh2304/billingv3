@@ -5,6 +5,7 @@ from rest_framework.decorators import api_view
 from app import models
 from app.common import bulk_raw_insert
 from custom.classes import IkeaDownloader
+from app.stock_check import get_sku_to_cbu_map
 
 @api_view(["POST"])
 def get_bill_products(request) : 
@@ -34,9 +35,11 @@ def get_bill_products(request) :
     maps = {varient: ",".join(barcodes) for varient, barcodes in varient_maps.items()}
     df["barcode"] = df["itemvarient"].apply(lambda x: maps.get(x, None))
     
-
-    maps = list(models.PurchaseProduct.objects.filter(sku__in=df["sku_small"].values).values_list("sku", "cbu"))
-    maps = {sku: cbu for sku, cbu in maps}
+    #Deprecate : Use current purchase only 
+    #maps = list(models.PurchaseProduct.objects.filter(sku__in=df["sku_small"].values).values_list("sku", "cbu"))
+    #maps = {sku: cbu for sku, cbu in maps}
+    #Use Purchases from both rural and urban 
+    maps = get_sku_to_cbu_map(df["sku_small"].values)
     df["cbu"] = df["sku_small"].apply(lambda x: maps.get(x, None))
 
     df = df.sort_values(by=["mrp","sku"])

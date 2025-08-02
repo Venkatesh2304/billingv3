@@ -510,7 +510,6 @@ class TruckProduct(models.Model) :
      box = models.IntegerField(default=1,db_default=1)  
      mrp = models.IntegerField()
 
-     
 class Barcode(models.Model) : 
      sku = models.CharField(max_length=20,primary_key=True)
      barcode = models.CharField(max_length=300)
