@@ -55,6 +55,12 @@ os.remove("app_purchaseproduct_rural.csv")
 os.remove("app_purchaseproduct_urban.csv")
 df1.to_excel("missing_cbu_urban.xlsx", index=False)
 df2.to_excel("missing_cbu_rural.xlsx", index=False)
+print("Missing CBU in Urban and Rural is saved in missing_cbu_urban.xlsx and missing_cbu_rural.xlsx respectively.")
+print("Needed Purchase Invoice in Urban")
+print(*list(set(df1["Supplier Invoice No"].dropna().apply(lambda x : str(x).split(".")[0]).values)),sep="\n")
+print("Needed Purchase Invoice in Rural")
+print(*list(set(df2["Supplier Invoice No"].dropna().apply(lambda x : str(x).split(".")[0]).values)),sep="\n")
+
 
 
 

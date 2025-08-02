@@ -59,8 +59,6 @@ urlpatterns = [
     path('finish_load/', load.finish_load , name='finish_load'),
     path('load_summary/', load.load_summary , name='load_summary'),
     path('scan_product/', load.scan_product , name='scan_product'),
-    path('barcode_to_cbu/', load.barcode_to_cbu , name='barcode_to_cbu'),
-    path('map_barcode_to_cbu/', load.map_barcode_to_cbu , name='map_barcode_to_cbu'),
     path('get_box_no/', load.get_box_no , name='get_box_no'),
 
     path('get_bill_products/', bill_check.get_bill_products , name='get_bill_products'),

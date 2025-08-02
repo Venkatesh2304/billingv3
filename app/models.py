@@ -337,6 +337,8 @@ class Outstanding(models.Model) :
 class BarcodeMap(models.Model) :
      barcode = models.CharField(max_length=300,primary_key=True)
      varient = models.CharField(max_length=20,null=True,blank=True)
+     sku = models.CharField(max_length=20,null=True,blank=True)
+
      
 
 # class SalesmanPendingSheetX(Beat) :
@@ -510,9 +512,6 @@ class TruckProduct(models.Model) :
      box = models.IntegerField(default=1,db_default=1)  
      mrp = models.IntegerField()
 
-class Barcode(models.Model) : 
-     sku = models.CharField(max_length=20,primary_key=True)
-     barcode = models.CharField(max_length=300)
 
 # class SalesmanCollectionBill(models.Model) : 
 #     chq = ForeignKey("app.SalesmanCollection",on_delete=models.CASCADE,related_name="bills")

@@ -9,16 +9,11 @@ import pandas as pd
 from app.models import *
 import warnings
 from app.common import bulk_raw_insert
-from custom.classes import IkeaDownloader
 
 warnings.filterwarnings("ignore")
 pd.options.display.float_format = '{:.2f}'.format
-maps = json.load(open("barcodes.json","r"))
-for k,v in maps.items() :
-    BarcodeMap.objects.create(
-        barcode = k,
-        varient = v)
-    print(k,v)
+
+    #print(k,v)
 
 
 

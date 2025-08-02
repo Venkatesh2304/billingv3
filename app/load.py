@@ -90,18 +90,7 @@ def get_cbu_codes(request) :
     cbu_codes = models.PurchaseProduct.objects.filter(inum__load=load).values_list("cbu",flat=True).distinct()
     return JsonResponse(list(cbu_codes),safe=False)
 
-@api_view(["POST"])
-def barcode_to_cbu(request) : 
-    barcode = request.data.get("barcode").upper().strip()
-    obj = models.Barcode.objects.get(barcode=barcode)
-    return JsonResponse({"cbu" : obj.cbu if obj else None })
 
-@api_view(["POST"])
-def map_barcode_to_cbu(request) : 
-    barcode = request.data.get("barcode").upper().strip()
-    cbu = request.data.get("cbu").strip().upper()
-    models.Barcode.objects.create(barcode=barcode,cbu=cbu).save()
-    return JsonResponse({"status": "success", "message": "Barcode mapped to CBU successfully"})
 
 @api_view(["POST"])
 def get_product(request) : 

@@ -34,14 +34,13 @@ def get_bill_products(request) :
         varient_maps[varient].append(barcode)
     maps = {varient: ",".join(barcodes) for varient, barcodes in varient_maps.items()}
     df["barcode"] = df["itemvarient"].apply(lambda x: maps.get(x, None))
-    
-    #Deprecate : Use current purchase only 
+    del df["itemvarient"]
+    #Deprecate : Use current rs purchase only 
     #maps = list(models.PurchaseProduct.objects.filter(sku__in=df["sku_small"].values).values_list("sku", "cbu"))
     #maps = {sku: cbu for sku, cbu in maps}
     #Use Purchases from both rural and urban 
     maps = get_sku_to_cbu_map(df["sku_small"].values)
     df["cbu"] = df["sku_small"].apply(lambda x: maps.get(x, None))
-
     df = df.sort_values(by=["mrp","sku"])
     return JsonResponse(df.to_dict(orient="records"),safe=False)
 
