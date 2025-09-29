@@ -2,6 +2,7 @@ from collections import Counter
 import contextlib
 import datetime
 from io import BytesIO
+import pprint
 import secrets
 import string
 from django.http import FileResponse, JsonResponse
@@ -38,13 +39,12 @@ def extract_product_quantities(bytesio):
     codes = codes.split("SKU code")[-1].split("Net Payabl")[0].splitlines()[1:]
     cbu = codes[::2]
     sku = codes[1::2]
-
-    qtys = qtys.split("Per Unit\n")[-1].splitlines()
+    qtys = qtys.split("Old MRP\n")[-1].splitlines()
     qtys = [qty.split("TAX")[0] for qty in qtys if qty]
     qtys = [qty for qty in qtys if qty]
-    qtys = qtys[: len(codes)]
-    mrps = [int(mrp.split(".")[0]) for mrp in qtys[1::2]]
-    qtys = [int(qty.split("/")[0].strip()) for qty in qtys[::2]]
+    qtys = qtys[: int(len(codes)*3/2)]
+    mrps = [int(mrp.split(".")[0]) for mrp in qtys[1::3]]
+    qtys = [int(qty.split("/")[0].strip()) for qty in qtys[::3]]
     return inum , list(zip(cbu, sku, mrps,qtys))
 
 @api_view(["POST"])
