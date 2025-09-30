@@ -2,6 +2,7 @@ import base64
 import datetime
 import hashlib
 from io import BytesIO
+import io
 from json import JSONDecodeError
 import json
 import os
@@ -97,7 +98,8 @@ def bank_statement_upload(request) :
     bank_name = "sbi" if excel_file.name.endswith("xls") else "kvb" 
     df = pd.DataFrame()
     def skiprows_excel(excel_file,col_name,col_number,sep) : 
-        df = pd.read_csv(excel_file , skiprows=0 , sep=sep , names = list(range(0,100)) , header = None)
+        text_stream = io.TextIOWrapper(excel_file.file, encoding="utf-8", errors="replace")
+        df = pd.read_csv(text_stream , skiprows=0 , sep=sep , names = list(range(0,100)) , header = None,engine="python")
         skiprows = -1 
         acc_no = None 
         for i in range(0,20) :   
