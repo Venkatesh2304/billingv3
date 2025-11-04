@@ -9,6 +9,7 @@ import pandas as pd
 from app.models import *
 import warnings
 from app.common import bulk_raw_insert
+from custom.classes import IkeaDownloader
 
 warnings.filterwarnings("ignore")
 pd.options.display.float_format = '{:.2f}'.format
@@ -17,8 +18,12 @@ pd.options.display.float_format = '{:.2f}'.format
 
 
 
-# tod = datetime.date.today()
-# fromd = tod - datetime.timedelta(days=15)
+
+tod = datetime.date.today()
+fromd = tod - datetime.timedelta(days=15)
+df = IkeaDownloader().download_manual_collection()
+print( df )
+
 # IkeaDownloader().product_wise_purchase(fromd,tod).to_excel("a.xlsx")
 
 exit(0)

@@ -1044,7 +1044,7 @@ headers = {
 
 data = {
     'jsonObjfileInfi': '[{"title":"Collection Download, Collection Details, Retailer Bank,Payment Mode","reportfilename":"Collection Download","viewpage":"collecction","viewname":"COLLECTION_BULK_DWN_XL","querycount":3}]',
-    'jsonObjWhereClause': '{":val1":"",":val2":"-1",":val3":-1,":val4":-1,":val5":"",":val6":-1,":val7":-1,":val8":-1,":val9":"29/03/2024",":val10":"25/09/2024",":val11":"",":val12":""}',
+    'jsonObjWhereClause': '{":val1":"",":val2":"-1",":val3":-1,":val4":-1,":val5":"",":val6":"",":val7":-1,":val8":-1,":val9":"29/03/2024",":val10":"25/09/2024",":val11":"",":val12":""}',
 }
 
 ikea_download_manual_collection = CurlRequest('POST',
