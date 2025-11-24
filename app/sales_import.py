@@ -161,8 +161,8 @@ def AdjustmentInsert(crnote) :
     ledger_insert("adjustment",df[models.Adjustment.columns],"inum")
 
 def PartyInsert(party) : 
-    pm = party.rename(columns={"Party Name":"name","Address":"addr","Party Code":"code",
-                            "HUL Code":"hul_code","Party Master Code":"master_code"})[["addr","name","code","master_code","hul_code"]]
+    pm = party.rename(columns={"PARTY NAME":"name","ADDRESS":"addr","PARTY CODE":"code",
+                            "ACN Ref Code":"hul_code","Party Master Code":"master_code"})[["addr","name","code","master_code","hul_code"]]
     pm = pm.drop_duplicates("code")
     strips = lambda df,val : df.str.split(val).str[0].str.strip(" \t,")
     pm["phone"] = pm["addr"].str.split("PH :").str[1].str.strip()

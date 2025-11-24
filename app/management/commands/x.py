@@ -13,6 +13,9 @@ from custom.classes import IkeaDownloader
 
 warnings.filterwarnings("ignore")
 pd.options.display.float_format = '{:.2f}'.format
+i = IkeaDownloader()
+i.party_master().to_excel("a.xlsx",index=False)
+
 
     #print(k,v)
 
