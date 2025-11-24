@@ -77,9 +77,9 @@ def billing_view(request) :
     billing_log.save()
     for process_name in billing_process_names :
         models.BillingProcessStatus(billing = billing_log,process = process_name,status = BillingStatus.NotStarted).save()
-    
-    thread = threading.Thread( target = run_billing_process , args = (billing_log,data) )
-    thread.start() 
+    run_billing_process(billing_log,data)
+    # thread = threading.Thread( target = run_billing_process , args = (billing_log,data) )
+    # thread.start() 
     return JsonResponse({"billing_id" : billing_log.id })
     
 def run_billing_process(billing_log,data) :
@@ -95,14 +95,19 @@ def run_billing_process(billing_log,data) :
     forced_order_nos = [ order_no for order_no, selected in data.get("force_place").items() if selected ]
     
     old_billing_id = data.get("billing_id")
+    
     if old_billing_id :
         old_billing = models.Billing.objects.get(id = old_billing_id)
         last_billing_orders = models.Orders.objects.filter(billing = old_billing)
+        x = list(last_billing_orders)
         creditrelease = list(last_billing_orders.filter(creditlock=True,order_no__in = forced_order_nos))
+        y = creditrelease
         creditrelease = pd.DataFrame([ [order.party_id , order.party_id , order.party.hul_code ,order.beat.plg.replace('+','%2B')] for order in creditrelease ] , # type: ignore
                                     columns=["partyCode","parCodeRef","parHllCode","showPLG"])
-        creditrelease = creditrelease.groupby(["partyCode","parCodeRef","parHllCode","showPLG"]).size().reset_index(name='increase_count') # type: ignore
-        creditrelease = creditrelease.to_dict(orient="records")
+        creditrelease1 = creditrelease.groupby(["partyCode","parCodeRef","parHllCode","showPLG"]).size().reset_index(name='increase_count') # type: ignore
+        creditrelease2 = creditrelease1.to_dict(orient="records")
+        dfsdfs
+        creditrelease = creditrelease2
     else : 
         creditrelease = []
      
