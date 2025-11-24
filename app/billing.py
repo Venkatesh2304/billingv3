@@ -181,7 +181,7 @@ def run_billing_process(billing_log,data) :
         billing_log.end_bill_no = billing.bills[-1]
         billing_log.bill_count = len(billing.bills)
         billing_log.save()
-
+    billing.logger.info(f"Credit Release List : {creditrelease}")
     ##Start the proccess
     billing_process_functions = [billing.Sync , PrevDeliveryProcess ,  (lambda : billing.release_creditlocks(creditrelease)) , 
                                   CollectionProcess ,  OrderProcess ,  DeliveryProcess , ReportProcess  ]
