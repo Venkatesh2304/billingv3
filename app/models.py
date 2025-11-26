@@ -41,6 +41,7 @@ class Orders(models.Model) :
     type = models.TextField(max_length=15,choices=(("SH","Shikhar"),("SE","Salesman")),blank=True,null=True)
     billing = models.ForeignKey(Billing,on_delete=models.CASCADE,related_name="orders",null=True,blank=True)
     party = models.ForeignKey("app.Party",on_delete=models.DO_NOTHING,related_name="orders")
+    party_hul_code = models.TextField(max_length=40,null=True,blank=True)
     beat = models.ForeignKey("app.Beat",on_delete=models.DO_NOTHING,related_name="orders",db_constraint=False,db_index=False)
     place_order = models.BooleanField(default=False,db_default=False)
     force_order = models.BooleanField(default=False,db_default=False)

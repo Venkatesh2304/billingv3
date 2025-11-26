@@ -99,7 +99,7 @@ def run_billing_process(billing_log,data) :
         old_billing = models.Billing.objects.get(id = old_billing_id)
         last_billing_orders = models.Orders.objects.filter(billing = old_billing)
         creditrelease = list(last_billing_orders.filter(creditlock=True,order_no__in = forced_order_nos))
-        creditrelease = pd.DataFrame([ [order.party_id , order.party_id , order.party.hul_code ,order.beat.plg.replace('+','%2B')] for order in creditrelease ] , # type: ignore
+        creditrelease = pd.DataFrame([ [order.party_id , order.party_id , order.party_hul_code ,order.beat.plg.replace('+','%2B')] for order in creditrelease ] , # type: ignore
                                     columns=["partyCode","parCodeRef","parHllCode","showPLG"])
         creditrelease = creditrelease.groupby(["partyCode","parCodeRef","parHllCode","showPLG"]).size().reset_index(name='increase_count') # type: ignore
         creditrelease = creditrelease.to_dict(orient="records")
@@ -154,7 +154,7 @@ def run_billing_process(billing_log,data) :
         
         ## Warning add and condition 
         order_objects.extend( models.Orders.objects.bulk_create([ 
-            models.Orders( order_no=row.on,party_id = row.pc,salesman=row.s, 
+            models.Orders( order_no=row.on,party_id = row.pc, party_hul_code = row.ph , salesman=row.s, 
                     creditlock = ("Credit Exceeded" in row.ar) , place_order = (row.on in filtered_orders) , 
                 beat_id = row.mi , billing = billing_log , date = datetime.datetime.now().date() , type = row.ot   ) 
             for _,row in last_billing_orders.drop_duplicates(subset="on").iterrows() ],
