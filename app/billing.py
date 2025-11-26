@@ -160,7 +160,7 @@ def run_billing_process(billing_log,data) :
             for _,row in last_billing_orders.drop_duplicates(subset="on").iterrows() ],
          update_conflicts=True,
          unique_fields=['order_no'],
-         update_fields=["billing_id","type","creditlock","place_order"]) )
+         update_fields=["billing_id","type","creditlock","place_order","party_hul_code"]) )
         
 
         models.OrderProducts.objects.filter(order__in = order_objects,allocated = 0).update(allocated = F("quantity"),reason = "Guessed allocation")
