@@ -51,8 +51,8 @@ def refresh_outstanding(func) :
               UNION ALL
               SELECT party_id, to_bill_id AS inum, date, adj_amt AS amt, NULL AS beat FROM app_adjustment
             ) AS all_data
-            GROUP BY party_id, inum
             where inum = 'CB00663'
+            GROUP BY party_id, inum
         """
         ,is_select=True))
         query_db('''
