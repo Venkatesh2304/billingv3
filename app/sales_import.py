@@ -40,6 +40,21 @@ def refresh_outstanding(func) :
         func(*args,**kwargs)
         query_db('DELETE FROM app_outstanding')
         print(query_db("select * from app_sales where inum = 'CB00663'",is_select=True))
+        print(query_db(f"""
+            SELECT party_id, inum, SUM(amt) AS balance, MAX(beat) AS beat, MIN(date) AS date 
+            FROM (
+              SELECT party_id, inum, '2023-04-01' AS date, amt, beat FROM app_openingbalance
+              UNION ALL
+              SELECT party_id, inum, date, amt, beat FROM app_sales WHERE type = 'sales'
+              UNION ALL
+              SELECT party_id, bill_id AS inum, date, amt, NULL AS beat FROM app_collection
+              UNION ALL
+              SELECT party_id, to_bill_id AS inum, date, adj_amt AS amt, NULL AS beat FROM app_adjustment
+            ) AS all_data
+            GROUP BY party_id, inum
+            where inum = 'CB00663'
+        """
+        ,is_select=True))
         query_db('''
             INSERT INTO app_outstanding (party_id, inum, balance, beat, date)
             SELECT party_id, inum, SUM(amt) AS balance, MAX(beat) AS beat, MIN(date) AS date 
