@@ -314,7 +314,7 @@ class Outstanding(models.Model) :
       balance = FloatField()
       beat = models.TextField(max_length=40,null=True)
       date = DateField()
-
+      
       def __str__(self) -> str:
            return self.inum #+ "-" + self.party.name
                          

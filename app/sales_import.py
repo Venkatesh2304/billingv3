@@ -39,6 +39,7 @@ def refresh_outstanding(func) :
     def decorated_function(*args,**kwargs) :
         func(*args,**kwargs)
         query_db('DELETE FROM app_outstanding')
+        print(query_db("select * from app_sales where inum = 'CB00663'",is_select=True))
         query_db('''
             INSERT INTO app_outstanding (party_id, inum, balance, beat, date)
             SELECT party_id, inum, SUM(amt) AS balance, MAX(beat) AS beat, MIN(date) AS date 
