@@ -6,6 +6,15 @@ import app.models as models
 
 CLAIM_SERVICE_TDS_RATE = 0.02  
 
+UPDATE_COLL_PARTY_QUERY = """UPDATE app_collection SET party_id = (
+    select * from 
+    (
+        SELECT party_id FROM app_sales WHERE app_sales.inum = bill_id
+        union all 
+        SELECT party_id FROM app_openingbalance WHERE app_openingbalance.inum = bill_id
+    ) as all_data
+    limit 1)  WHERE party_id is NULL ;"""
+
 def delete_sales(type) : 
     query_db(f"DELETE FROM app_inventory WHERE bill_id in (select inum from app_sales where type='{type}')")
     query_db(f"DELETE FROM app_sales where type='{type}'")
@@ -39,23 +48,7 @@ def refresh_outstanding(func) :
     def decorated_function(*args,**kwargs) :
         func(*args,**kwargs)
         query_db('DELETE FROM app_outstanding')
-        print(query_db("select * from app_sales where inum = 'CB00663'",is_select=True))
-        return 
-        print(query_db(f"""
-            SELECT party_id, inum, SUM(amt) AS balance, MAX(beat) AS beat, MIN(date) AS date 
-            FROM (
-              SELECT party_id, inum, '2023-04-01' AS date, amt, beat FROM app_openingbalance
-              UNION ALL
-              SELECT party_id, inum, date, amt, beat FROM app_sales WHERE type = 'sales'
-              UNION ALL
-              SELECT party_id, bill_id AS inum, date, amt, NULL AS beat FROM app_collection
-              UNION ALL
-              SELECT party_id, to_bill_id AS inum, date, adj_amt AS amt, NULL AS beat FROM app_adjustment
-            ) AS all_data
-            where inum = 'CB00663'
-            GROUP BY party_id, inum
-        """
-        ,is_select=True))
+        query_db(UPDATE_COLL_PARTY_QUERY)
         query_db('''
             INSERT INTO app_outstanding (party_id, inum, balance, beat, date)
             SELECT party_id, inum, SUM(amt) AS balance, MAX(beat) AS beat, MIN(date) AS date 
@@ -70,7 +63,7 @@ def refresh_outstanding(func) :
             ) AS all_data
             GROUP BY party_id, inum 
         ''')
-            # HAVING ABS(SUM(amt)) > 1
+        # HAVING ABS(SUM(amt)) > 1
     return decorated_function
 
 @refresh_outstanding
@@ -153,15 +146,7 @@ def CollectionInsert(coll) :
    coll["mode"] = coll.Status.replace({"CSH":"Cash"}) # { k : "Bank" for k in ["CHQ","NEFT","RTGS","UPI","IMPS"] } 
    coll["party_id"] = None
    ledger_insert("collection",coll[ models.Collection.columns ],index = "inum")
-   query = """UPDATE app_collection SET party_id = (
-    select * from 
-    (
-        SELECT party_id FROM app_sales WHERE app_sales.inum = bill_id
-        union all 
-        SELECT party_id FROM app_openingbalance WHERE app_openingbalance.inum = bill_id
-    ) as all_data
-    limit 1)  WHERE party_id is NULL ;"""
-   query_db( query )
+   query_db( UPDATE_COLL_PARTY_QUERY )
 
 @refresh_outstanding
 def AdjustmentInsert(crnote) :  
