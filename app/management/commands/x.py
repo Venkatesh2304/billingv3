@@ -14,18 +14,13 @@ from custom.classes import IkeaDownloader
 warnings.filterwarnings("ignore")
 pd.options.display.float_format = '{:.2f}'.format
 i = IkeaDownloader()
-i.party_master().to_excel("a.xlsx",index=False)
-
-
-    #print(k,v)
-
-
-
-
 tod = datetime.date.today()
-fromd = tod - datetime.timedelta(days=15)
-df = IkeaDownloader().download_manual_collection()
-print( df )
+fromd = tod - datetime.timedelta(days=1)
+i.cookies.clear()
+i.login()
+print(i.sales_reg(fromd,tod))
+
+# i.product_wise_purchase(fromd,tod).to_excel("a.xlsx")
 
 # IkeaDownloader().product_wise_purchase(fromd,tod).to_excel("a.xlsx")
 
